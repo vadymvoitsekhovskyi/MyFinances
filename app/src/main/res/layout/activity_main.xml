@@ -24,19 +24,25 @@
             android:orientation="horizontal"
             android:paddingHorizontal="16dp">
 
+            <ImageView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_logo" />
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="MyFinance"
                 android:textColor="#212121"
-                android:textSize="28sp"
+                android:textSize="28dp"
                 android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/btnStatistics"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
@@ -46,8 +52,8 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cvProfile"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?android:attr/selectableItemBackground"
@@ -180,48 +186,20 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <TextView
-        android:id="@+id/tvHistoryLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:text="Останні транзакції"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardBalance" />
-
-    <ImageView
-        android:id="@+id/btnResetFilters"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true"
-        android:padding="4dp"
-        android:src="@android:drawable/ic_popup_sync"
-        app:tint="@color/primary_green"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/tvHistoryLabel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvHistoryLabel" />
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilSearch"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         app:startIconDrawable="@android:drawable/ic_menu_search"
         app:startIconTint="@color/primary_green"
         app:hintEnabled="true"
         android:hint="Пошук за категорією, коментарем або сумою"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvHistoryLabel">
+        app:layout_constraintTop_toBottomOf="@id/cardBalance">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSearch"
@@ -230,7 +208,6 @@
             android:inputType="text"
             android:maxLines="1"
             android:imeOptions="actionSearch" />
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <HorizontalScrollView
@@ -289,6 +266,36 @@
         </LinearLayout>
     </HorizontalScrollView>
 
+    <TextView
+        android:id="@+id/tvHistoryLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Останні транзакції"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScroll" />
+
+    <!-- 4. Кнопка "Скинути" як текст (праворуч від "Останні транзакції") -->
+    <TextView
+        android:id="@+id/btnResetFilters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="4dp"
+        android:text="Скинути"
+        android:textColor="@color/primary_green"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/tvHistoryLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvHistoryLabel" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTransactions"
         android:layout_width="match_parent"
@@ -297,7 +304,7 @@
         android:clipToPadding="false"
         android:paddingBottom="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filterScroll" />
+        app:layout_constraintTop_toBottomOf="@id/tvHistoryLabel" />
 
     <TextView
         android:id="@+id/tvEmptyState"
@@ -310,7 +317,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filterScroll" />
+        app:layout_constraintTop_toBottomOf="@id/tvHistoryLabel" />
 
     <LinearLayout
         android:id="@+id/glossyBottomPanel"
@@ -327,16 +334,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- Кнопка Вверх -->
         <ImageButton
             android:id="@+id/btnScrollUp"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/arrow_up_float"
-            app:tint="@color/primary_green" />
+            app:tint="@color/primary_green"
+            android:elevation="0dp"
+            android:stateListAnimator="@null" />
 
-        <!-- Кнопка Вниз -->
         <ImageButton
             android:id="@+id/btnScrollDown"
             android:layout_width="48dp"
@@ -344,15 +351,15 @@
             android:layout_marginStart="4dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/arrow_down_float"
-            app:tint="@color/primary_green" />
+            app:tint="@color/primary_green"
+            android:elevation="0dp"
+            android:stateListAnimator="@null" />
 
-        <!-- Розпірка, яка заповнить порожнечу і відштовхне плюс вправо -->
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- Кнопка Додати -->
         <ImageButton
             android:id="@+id/btnAddTransaction"
             android:layout_width="56dp"

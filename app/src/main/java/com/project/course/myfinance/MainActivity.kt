@@ -44,7 +44,7 @@ import java.util.Locale
 import java.util.TimeZone
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var btnResetFilters: ImageView
+    private lateinit var btnResetFilters: TextView
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
     private lateinit var transactionAdapter: TransactionAdapter
