@@ -63,7 +63,8 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var layoutSystem: LinearLayout
     private var currentExportFormat: String = "csv"
     private val gson = Gson()
-    private val WEB_CLIENT_ID = "789190818561-pfb6m4vr207b90s5r1ku8pm07bl070i2.apps.googleusercontent.com"
+    private val WEB_CLIENT_ID =
+        "789190818561-pfb6m4vr207b90s5r1ku8pm07bl070i2.apps.googleusercontent.com"
     private lateinit var googleSignInClient: GoogleSignInClient
     private var onGoogleReAuthSuccess: (() -> Unit)? = null
 
@@ -89,30 +90,36 @@ class ProfileActivity : AppCompatActivity() {
             uri?.let { performImport(it) }
         }
 
-    private val googleReAuthLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        setLoading(false)
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                val idToken = account?.idToken
-                if (idToken != null) {
-                    setLoading(true)
-                    val credential = GoogleAuthProvider.getCredential(idToken, null)
-                    auth.currentUser?.reauthenticate(credential)?.addOnCompleteListener { reAuthTask ->
-                        if (reAuthTask.isSuccessful) {
-                            onGoogleReAuthSuccess?.invoke()
-                        } else {
-                            setLoading(false)
-                            Toast.makeText(this, "Помилка перевірки акаунта", Toast.LENGTH_SHORT).show()
-                        }
+    private val googleReAuthLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            setLoading(false)
+            if (result.resultCode == Activity.RESULT_OK) {
+                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                try {
+                    val account = task.getResult(ApiException::class.java)
+                    val idToken = account?.idToken
+                    if (idToken != null) {
+                        setLoading(true)
+                        val credential = GoogleAuthProvider.getCredential(idToken, null)
+                        auth.currentUser?.reauthenticate(credential)
+                            ?.addOnCompleteListener { reAuthTask ->
+                                if (reAuthTask.isSuccessful) {
+                                    onGoogleReAuthSuccess?.invoke()
+                                } else {
+                                    setLoading(false)
+                                    Toast.makeText(
+                                        this,
+                                        "Помилка перевірки акаунта",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
                     }
+                } catch (e: ApiException) {
+                    Toast.makeText(this, "Вхід скасовано або помилка", Toast.LENGTH_SHORT).show()
                 }
-            } catch (e: ApiException) {
-                Toast.makeText(this, "Вхід скасовано або помилка", Toast.LENGTH_SHORT).show()
             }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,6 +130,145 @@ class ProfileActivity : AppCompatActivity() {
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
+
+        val btnSetPin = findViewById<Button>(R.id.btnSetPin)
+        val btnRemovePin = findViewById<Button>(R.id.btnRemovePin)
+
+        fun updatePinButtons() {
+            val prefs = getSharedPreferences("pin_prefs", android.content.Context.MODE_PRIVATE)
+            if (prefs.getString("app_pin", null) != null) {
+                btnSetPin.text = "Змінити PIN-код"
+                btnRemovePin.visibility = View.VISIBLE
+            } else {
+                btnSetPin.text = "Встановити PIN-код"
+                btnRemovePin.visibility = View.GONE
+            }
+        }
+        updatePinButtons()
+
+        btnSetPin.setOnClickListener {
+            val layout = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(64, 40, 64, 10)
+            }
+
+            val til1 = com.google.android.material.textfield.TextInputLayout(this).apply {
+                hint = "Новий PIN (4-16 цифр)"
+                endIconMode =
+                    com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { setMargins(0, 0, 0, 16) }
+            }
+            val input1 = com.google.android.material.textfield.TextInputEditText(this).apply {
+                inputType =
+                    android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                filters = arrayOf(android.text.InputFilter.LengthFilter(16))
+            }
+            til1.addView(input1)
+
+            val til2 = com.google.android.material.textfield.TextInputLayout(this).apply {
+                hint = "Повторіть PIN"
+                endIconMode =
+                    com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            }
+            val input2 = com.google.android.material.textfield.TextInputEditText(this).apply {
+                inputType =
+                    android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                filters = arrayOf(android.text.InputFilter.LengthFilter(16))
+            }
+            til2.addView(input2)
+
+            layout.addView(til1)
+            layout.addView(til2)
+
+            val dialog = AlertDialog.Builder(this)
+                .setTitle("PIN-код")
+                .setView(layout)
+                .setPositiveButton("Зберегти", null)
+                .setNegativeButton("Скасувати", null)
+                .create()
+
+            dialog.setOnShowListener {
+                val btnSave = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                btnSave.setOnClickListener {
+                    val pin1 = input1.text.toString()
+                    val pin2 = input2.text.toString()
+
+                    if (pin1.isEmpty() || pin2.isEmpty()) {
+                        Toast.makeText(this, "Поля не можуть бути порожніми", Toast.LENGTH_SHORT)
+                            .show()
+                    } else if (pin1.length < 4) {
+                        Toast.makeText(
+                            this,
+                            "PIN-код має містити мінімум 4 цифри",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else if (pin1 != pin2) {
+                        Toast.makeText(this, "PIN-коди не співпадають", Toast.LENGTH_SHORT).show()
+                        input2.text?.clear()
+                    } else {
+                        getSharedPreferences("pin_prefs", android.content.Context.MODE_PRIVATE)
+                            .edit().putString("app_pin", pin1).apply()
+                        Toast.makeText(this, "PIN-код збережено", Toast.LENGTH_SHORT).show()
+                        updatePinButtons()
+                        dialog.dismiss()
+                    }
+                }
+            }
+            dialog.show()
+        }
+
+        btnRemovePin.setOnClickListener {
+            val layout = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(64, 40, 64, 10)
+            }
+
+            val til = com.google.android.material.textfield.TextInputLayout(this).apply {
+                hint = "Поточний PIN"
+                endIconMode =
+                    com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            }
+            val input = com.google.android.material.textfield.TextInputEditText(this).apply {
+                inputType =
+                    android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                filters = arrayOf(android.text.InputFilter.LengthFilter(16))
+            }
+            til.addView(input)
+            layout.addView(til)
+
+            val dialog = AlertDialog.Builder(this)
+                .setTitle("Видалення PIN-коду")
+                .setView(layout)
+                .setPositiveButton("Видалити", null)
+                .setNegativeButton("Скасувати", null)
+                .create()
+
+            dialog.setOnShowListener {
+                val btnDelete = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                btnDelete.setOnClickListener {
+                    val prefs =
+                        getSharedPreferences("pin_prefs", android.content.Context.MODE_PRIVATE)
+                    if (input.text.toString() == prefs.getString("app_pin", "")) {
+                        prefs.edit().remove("app_pin").apply()
+                        Toast.makeText(this, "PIN-код видалено", Toast.LENGTH_SHORT).show()
+                        updatePinButtons()
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(this, "Невірний PIN-код", Toast.LENGTH_SHORT).show()
+                        input.text?.clear()
+                    }
+                }
+            }
+            dialog.show()
+        }
 
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         tvBigProfileLetter = findViewById(R.id.tvBigProfileLetter)
@@ -146,7 +292,8 @@ class ProfileActivity : AppCompatActivity() {
         layoutSystem = findViewById(R.id.layoutSystem)
 
         val user = auth.currentUser
-        val hasPassword = user?.providerData?.any { it.providerId == EmailAuthProvider.PROVIDER_ID } == true
+        val hasPassword =
+            user?.providerData?.any { it.providerId == EmailAuthProvider.PROVIDER_ID } == true
         btnChangePassword.text = if (hasPassword) "Змінити пароль" else "Створити пароль"
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
@@ -171,6 +318,11 @@ class ProfileActivity : AppCompatActivity() {
         btnImportData.setOnClickListener { showImportDialog() }
         btnLogout.setOnClickListener { showLogoutDialog() }
         btnDeleteAccount.setOnClickListener { showDeleteAccountDialog() }
+    }
+
+    override fun dispatchTouchEvent(event: android.view.MotionEvent): Boolean {
+        (application as? MyFinanceApp)?.resetInactivityTimer()
+        return super.dispatchTouchEvent(event)
     }
 
     private fun showExportDialog() {
@@ -258,10 +410,12 @@ class ProfileActivity : AppCompatActivity() {
         setLoading(true)
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val content = contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+                val content =
+                    contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
                 if (content.isNullOrBlank()) throw Exception("Файл порожній або його неможливо прочитати")
 
-                val cleanContent = if (content.startsWith("\uFEFF")) content.substring(1) else content
+                val cleanContent =
+                    if (content.startsWith("\uFEFF")) content.substring(1) else content
                 val isJson = cleanContent.trimStart().startsWith("[")
 
                 val importedTransactions = if (isJson) {
@@ -279,6 +433,7 @@ class ProfileActivity : AppCompatActivity() {
                             } catch (e: Exception) {
                                 System.currentTimeMillis()
                             }
+
                             is Number -> dateVal.toLong()
                             else -> System.currentTimeMillis()
                         }
@@ -406,7 +561,8 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun showAvatarOptionsDialog() {
         val hasPhoto = ivBigProfile.visibility == View.VISIBLE
-        val options = if (hasPhoto) arrayOf("Змінити/Редагувати", "Видалити") else arrayOf("Встановити")
+        val options =
+            if (hasPhoto) arrayOf("Змінити/Редагувати", "Видалити") else arrayOf("Встановити")
 
         AlertDialog.Builder(this)
             .setTitle("Фото профілю")
@@ -557,7 +713,8 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun showChangeEmailDialog() {
         val user = auth.currentUser ?: return
-        val hasPassword = user.providerData.any { it.providerId == com.google.firebase.auth.EmailAuthProvider.PROVIDER_ID }
+        val hasPassword =
+            user.providerData.any { it.providerId == com.google.firebase.auth.EmailAuthProvider.PROVIDER_ID }
 
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -581,7 +738,8 @@ class ProfileActivity : AppCompatActivity() {
         if (hasPassword) {
             val tilPass = com.google.android.material.textfield.TextInputLayout(this).apply {
                 hint = "Поточний пароль"
-                endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+                endIconMode =
+                    com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -637,19 +795,25 @@ class ProfileActivity : AppCompatActivity() {
         user.verifyBeforeUpdateEmail(newEmail).addOnCompleteListener { task ->
             setLoading(false)
             if (task.isSuccessful) {
-                Toast.makeText(this, "Лист для підтвердження відправлено на новий email. Перезайдіть після підтвердження.", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    "Лист для підтвердження відправлено на новий email. Перезайдіть після підтвердження.",
+                    Toast.LENGTH_LONG
+                ).show()
                 dialog.dismiss()
                 auth.signOut()
                 goToLogin()
             } else {
-                Toast.makeText(this, "Помилка: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Помилка: ${task.exception?.message}", Toast.LENGTH_LONG)
+                    .show()
             }
         }
     }
 
     private fun showChangePasswordDialog() {
         val user = auth.currentUser ?: return
-        val hasPassword = user.providerData.any { it.providerId == com.google.firebase.auth.EmailAuthProvider.PROVIDER_ID }
+        val hasPassword =
+            user.providerData.any { it.providerId == com.google.firebase.auth.EmailAuthProvider.PROVIDER_ID }
 
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -660,7 +824,8 @@ class ProfileActivity : AppCompatActivity() {
         if (hasPassword) {
             val tilOldPass = com.google.android.material.textfield.TextInputLayout(this).apply {
                 hint = "Поточний пароль"
-                endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+                endIconMode =
+                    com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -675,7 +840,8 @@ class ProfileActivity : AppCompatActivity() {
 
         val tilNewPass = com.google.android.material.textfield.TextInputLayout(this).apply {
             hint = if (hasPassword) "Новий пароль" else "Створіть пароль"
-            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+            endIconMode =
+                com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -689,7 +855,8 @@ class ProfileActivity : AppCompatActivity() {
 
         val tilConfirmPass = com.google.android.material.textfield.TextInputLayout(this).apply {
             hint = "Підтвердіть пароль"
-            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+            endIconMode =
+                com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -720,7 +887,8 @@ class ProfileActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
                 if (newPass.length < 6) {
-                    Toast.makeText(this, "Пароль має бути від 6 символів", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Пароль має бути від 6 символів", Toast.LENGTH_SHORT)
+                        .show()
                     return@setOnClickListener
                 }
                 if (newPass != confirmPass) {
@@ -733,12 +901,20 @@ class ProfileActivity : AppCompatActivity() {
                         u.updatePassword(newPass).addOnCompleteListener { task ->
                             setLoading(false)
                             if (task.isSuccessful) {
-                                Toast.makeText(this, "Пароль оновлено! Увійдіть знову.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    this,
+                                    "Пароль оновлено! Увійдіть знову.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 dialog.dismiss()
                                 auth.signOut()
                                 goToLogin()
                             } else {
-                                Toast.makeText(this, "Помилка: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    this,
+                                    "Помилка: ${task.exception?.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
                     }, {})
@@ -748,11 +924,19 @@ class ProfileActivity : AppCompatActivity() {
                         user.updatePassword(newPass).addOnCompleteListener { task ->
                             setLoading(false)
                             if (task.isSuccessful) {
-                                Toast.makeText(this, "Пароль створено! Тепер можна входити і за паролем.", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    this,
+                                    "Пароль створено! Тепер можна входити і за паролем.",
+                                    Toast.LENGTH_LONG
+                                ).show()
                                 findViewById<Button>(R.id.btnChangePassword).text = "Змінити пароль"
                                 dialog.dismiss()
                             } else {
-                                Toast.makeText(this, "Помилка: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    this,
+                                    "Помилка: ${task.exception?.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
                     }
@@ -780,7 +964,8 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun showDeleteAccountDialog() {
         val user = auth.currentUser ?: return
-        val hasPassword = user.providerData.any { it.providerId == com.google.firebase.auth.EmailAuthProvider.PROVIDER_ID }
+        val hasPassword =
+            user.providerData.any { it.providerId == com.google.firebase.auth.EmailAuthProvider.PROVIDER_ID }
 
         if (hasPassword) {
             val layout = LinearLayout(this).apply {
@@ -790,7 +975,8 @@ class ProfileActivity : AppCompatActivity() {
 
             val tilPass = com.google.android.material.textfield.TextInputLayout(this).apply {
                 hint = "Введіть пароль для підтвердження"
-                endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+                endIconMode =
+                    com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT

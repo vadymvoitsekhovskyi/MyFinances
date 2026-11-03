@@ -45,7 +45,12 @@ class SplashActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             val currentUser = FirebaseAuth.getInstance().currentUser
             if (currentUser != null) {
-                startActivity(Intent(this, MainActivity::class.java))
+                val prefs = getSharedPreferences("pin_prefs", android.content.Context.MODE_PRIVATE)
+                if (prefs.getString("app_pin", null) != null) {
+                    startActivity(Intent(this, PinAuthActivity::class.java))
+                } else {
+                    startActivity(Intent(this, MainActivity::class.java))
+                }
             } else {
                 startActivity(Intent(this, LoginActivity::class.java))
             }

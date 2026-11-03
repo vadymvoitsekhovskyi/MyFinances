@@ -23,22 +23,25 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var viewModel: AuthViewModel
     private lateinit var googleSignInClient: GoogleSignInClient
 
-    private val googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                val idToken = account?.idToken
-                if (idToken != null) {
-                    viewModel.googleSignIn(idToken)
-                } else {
-                    Toast.makeText(this, "Не вдалося отримати токен Google", Toast.LENGTH_SHORT).show()
+    private val googleSignInLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                try {
+                    val account = task.getResult(ApiException::class.java)
+                    val idToken = account?.idToken
+                    if (idToken != null) {
+                        viewModel.googleSignIn(idToken)
+                    } else {
+                        Toast.makeText(this, "Не вдалося отримати токен Google", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                } catch (e: ApiException) {
+                    Toast.makeText(this, "Помилка Google Sign In: ${e.message}", Toast.LENGTH_SHORT)
+                        .show()
                 }
-            } catch (e: ApiException) {
-                Toast.makeText(this, "Помилка Google Sign In: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,12 +70,14 @@ class RegisterActivity : AppCompatActivity() {
                     btnRegister.isEnabled = false
                     btnGoogleSignIn.isEnabled = false
                 }
+
                 is AuthState.Success -> {
                     progressBar.visibility = View.GONE
                     val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                 }
+
                 is AuthState.Error -> {
                     progressBar.visibility = View.GONE
                     btnRegister.isEnabled = true
@@ -80,6 +85,7 @@ class RegisterActivity : AppCompatActivity() {
                     Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
                     viewModel.resetState()
                 }
+
                 is AuthState.Idle -> {
                     progressBar.visibility = View.GONE
                     btnRegister.isEnabled = true

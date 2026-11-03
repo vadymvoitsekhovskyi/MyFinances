@@ -94,20 +94,18 @@ class TransactionAdapter(
             val endOfDayBalance = dailyBalances[currentExactDateStr]
             if (endOfDayBalance != null) {
                 holder.tvHistoricalBalance.visibility = View.VISIBLE
-                holder.tvHistoricalBalance.text = String.format(Locale.US, "Баланс: %.2f ₴", endOfDayBalance)
+                holder.tvHistoricalBalance.text =
+                    String.format(Locale.US, "Баланс: %.2f ₴", endOfDayBalance)
             } else {
                 holder.tvHistoricalBalance.visibility = View.GONE
             }
 
-            // ЗМІНЕНО: дістаємо суми (якщо їх немає за цей день, буде 0.0)
             val dayIncome = dailyIncomes[currentExactDateStr] ?: 0.0
             val dayExpense = dailyExpenses[currentExactDateStr] ?: 0.0
 
-            // Завжди показуємо доходи
             holder.tvDateIncome.text = String.format(Locale.US, "+ %.2f ₴", dayIncome)
             holder.tvDateIncome.visibility = View.VISIBLE
 
-            // Завжди показуємо витрати
             holder.tvDateExpense.text = String.format(Locale.US, "- %.2f ₴", dayExpense)
             holder.tvDateExpense.visibility = View.VISIBLE
         }
@@ -156,7 +154,7 @@ class TransactionAdapter(
     fun updateDailyStats(
         newBalances: Map<String, Double>,
         newExpenses: Map<String, Double>,
-        newIncomes: Map<String, Double> // ДОДАТИ
+        newIncomes: Map<String, Double>
     ) {
         dailyBalances = newBalances
         dailyExpenses = newExpenses

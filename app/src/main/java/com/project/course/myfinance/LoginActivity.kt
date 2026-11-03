@@ -30,22 +30,25 @@ class LoginActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private lateinit var googleSignInClient: GoogleSignInClient
 
-    private val googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                val idToken = account?.idToken
-                if (idToken != null) {
-                    viewModel.googleSignIn(idToken)
-                } else {
-                    Toast.makeText(this, "Не вдалося отримати токен Google", Toast.LENGTH_SHORT).show()
+    private val googleSignInLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                try {
+                    val account = task.getResult(ApiException::class.java)
+                    val idToken = account?.idToken
+                    if (idToken != null) {
+                        viewModel.googleSignIn(idToken)
+                    } else {
+                        Toast.makeText(this, "Не вдалося отримати токен Google", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                } catch (e: ApiException) {
+                    Toast.makeText(this, "Помилка Google Sign In: ${e.message}", Toast.LENGTH_SHORT)
+                        .show()
                 }
-            } catch (e: ApiException) {
-                Toast.makeText(this, "Помилка Google Sign In: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,11 +77,13 @@ class LoginActivity : AppCompatActivity() {
                     btnLogin.isEnabled = false
                     btnGoogleSignIn.isEnabled = false
                 }
+
                 is AuthState.Success -> {
                     progressBar.visibility = View.GONE
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
                 }
+
                 is AuthState.Error -> {
                     progressBar.visibility = View.GONE
                     btnLogin.isEnabled = true
@@ -86,6 +91,7 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
                     viewModel.resetState()
                 }
+
                 is AuthState.Idle -> {
                     progressBar.visibility = View.GONE
                     btnLogin.isEnabled = true
@@ -122,7 +128,10 @@ class LoginActivity : AppCompatActivity() {
             setPadding(64, 40, 64, 10)
         }
 
-        val contextThemeWrapper = android.view.ContextThemeWrapper(this, com.google.android.material.R.style.Widget_MaterialComponents_TextInputLayout_OutlinedBox)
+        val contextThemeWrapper = android.view.ContextThemeWrapper(
+            this,
+            com.google.android.material.R.style.Widget_MaterialComponents_TextInputLayout_OutlinedBox
+        )
 
         val tilEmail = TextInputLayout(contextThemeWrapper).apply {
             hint = "Введіть ваш email"

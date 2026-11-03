@@ -102,7 +102,6 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // Ініціалізація нових кнопок нашої Glossy-панелі
         val btnAddTransaction = findViewById<ImageButton>(R.id.btnAddTransaction)
         val btnScrollUp = findViewById<ImageButton>(R.id.btnScrollUp)
         val btnScrollDown = findViewById<ImageButton>(R.id.btnScrollDown)
@@ -131,7 +130,8 @@ class MainActivity : AppCompatActivity() {
         btnFilterSpecificDate = findViewById(R.id.btnFilterSpecificDate)
         btnSortDate = findViewById(R.id.btnSortDate)
 
-        val etSearch = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etSearch)
+        val etSearch =
+            findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etSearch)
 
         etSearch.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -162,9 +162,8 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, StatisticsActivity::class.java))
         }
 
-        // Оновлені лісенери для нових кнопок панелі
         btnScrollUp.setOnClickListener {
-            rvTransactions.scrollToPosition(0) // Миттєвий скрол вверх
+            rvTransactions.scrollToPosition(0)
 
             if (isAllLoaded) {
                 isAllLoaded = false
@@ -176,7 +175,7 @@ class MainActivity : AppCompatActivity() {
         btnScrollDown.setOnClickListener {
             isScrollDownRequested = true
             isAllLoaded = true
-            loadTransactions() // Дані завантажаться, а миттєвий скрол вниз відбудеться вже всередині loadTransactions()
+            loadTransactions()
         }
 
         btnAddTransaction.setOnClickListener {
@@ -316,14 +315,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showSortDialog() {
-        val options = arrayOf("Спочатку нові (↓)", "Спочатку старі (↑)")
-        val checkedItem = if (currentSortOrder == "desc") 0 else 1
+        val options = arrayOf("Спочатку нові (↓)", "Спочатку старі (↑)", "Без коментарів")
+        val checkedItem = when (currentSortOrder) {
+            "desc" -> 0
+            "asc" -> 1
+            "no_comments" -> 2
+            else -> 0
+        }
 
         AlertDialog.Builder(this)
             .setTitle("Сортування за датою")
             .setSingleChoiceItems(options, checkedItem) { dialog, which ->
-                currentSortOrder = if (which == 0) "desc" else "asc"
-                btnSortDate.text = if (which == 0) "Сорт: Нові" else "Сорт: Старі"
+                currentSortOrder = when (which) {
+                    0 -> "desc"
+                    1 -> "asc"
+                    2 -> "no_comments"
+                    else -> "desc"
+                }
+                btnSortDate.text = when (which) {
+                    0 -> "Сорт: Нові"
+                    1 -> "Сорт: Старі"
+                    2 -> "Без комент."
+                    else -> "Сорт: Нові"
+                }
                 currentLimit = 100L
                 loadTransactions()
                 dialog.dismiss()
@@ -350,10 +364,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        result = if (currentSortOrder == "desc") {
-            result.sortedByDescending { it.date }
-        } else {
-            result.sortedBy { it.date }
+        result = when (currentSortOrder) {
+            "desc" -> result.sortedByDescending { it.date }
+            "asc" -> result.sortedBy { it.date }
+            "no_comments" -> result.filter { it.comment.isBlank() }.sortedByDescending { it.date }
+            else -> result.sortedByDescending { it.date }
         }
 
         transactionAdapter.updateData(result)
@@ -370,27 +385,28 @@ class MainActivity : AppCompatActivity() {
         val hasFilters = currentTypeFilter != "all" ||
                 currentCategoryFilter != "all" ||
                 currentSpecificDateFilter != null ||
-                currentSearchQuery.isNotBlank()
+                currentSearchQuery.isNotBlank() ||
+                currentSortOrder != "desc"
 
         btnResetFilters.visibility = if (hasFilters) View.VISIBLE else View.GONE
     }
 
     private fun resetFilters() {
-        // Скидаємо змінні
         currentTypeFilter = "all"
         currentCategoryFilter = "all"
         currentSpecificDateFilter = null
         currentSearchQuery = ""
+        currentSortOrder = "desc"
 
-        // Оновлюємо UI (текст кнопок та поле пошуку)
-        findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etSearch).setText("")
+        findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etSearch).setText(
+            ""
+        )
         btnFilterType.text = "Тип: Всі"
         btnFilterCategory.text = "Категорія: Всі"
         btnFilterSpecificDate.text = "Дата: Всі"
-        // Сортування (currentSortOrder) зазвичай залишають як було, але за бажанням можеш скинути і його
+        btnSortDate.text = "Сорт: Нові"
 
-        // Запускаємо завантаження без фільтрів
-        currentLimit = 30L // або 10L, як у тебе за замовчуванням
+        currentLimit = 30L
         isAllLoaded = false
         loadTransactions()
     }
@@ -573,50 +589,57 @@ class MainActivity : AppCompatActivity() {
         val currentUser = auth.currentUser ?: return
 
         balanceListener?.remove()
-        balanceListener = db.collection("users").document(currentUser.uid).collection("transactions")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
+        balanceListener =
+            db.collection("users").document(currentUser.uid).collection("transactions")
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null || snapshot == null) return@addSnapshotListener
 
-                val allTrans = snapshot.documents.mapNotNull { it.toObject(Transaction::class.java) }
-                val sortedTrans = allTrans.sortedBy { it.date }
+                    val allTrans =
+                        snapshot.documents.mapNotNull { it.toObject(Transaction::class.java) }
+                    val sortedTrans = allTrans.sortedBy { it.date }
 
-                var totalBalance = 0.0
-                val balancesMap = mutableMapOf<String, Double>()
-                val expensesMap = mutableMapOf<String, Double>()
-                val incomesMap = mutableMapOf<String, Double>()
+                    var totalBalance = 0.0
+                    val balancesMap = mutableMapOf<String, Double>()
+                    val expensesMap = mutableMapOf<String, Double>()
+                    val incomesMap = mutableMapOf<String, Double>()
 
-                val exactDateFormatter = SimpleDateFormat("ddMMyyyy", Locale.getDefault()).apply {
-                    this.timeZone = TimeZone.getTimeZone("Europe/Kyiv")
-                }
+                    val exactDateFormatter =
+                        SimpleDateFormat("ddMMyyyy", Locale.getDefault()).apply {
+                            this.timeZone = TimeZone.getTimeZone("Europe/Kyiv")
+                        }
 
-                for (t in sortedTrans) {
-                    val dateStr = exactDateFormatter.format(Date(t.date))
+                    for (t in sortedTrans) {
+                        val dateStr = exactDateFormatter.format(Date(t.date))
 
-                    if (t.type == "income") {
-                        totalBalance += t.amount
-                        incomesMap[dateStr] = (incomesMap[dateStr] ?: 0.0) + t.amount // ДОДАТИ
-                    } else {
-                        totalBalance -= t.amount
-                        expensesMap[dateStr] = (expensesMap[dateStr] ?: 0.0) + t.amount
+                        if (t.type == "income") {
+                            totalBalance += t.amount
+                            incomesMap[dateStr] = (incomesMap[dateStr] ?: 0.0) + t.amount
+                        } else {
+                            totalBalance -= t.amount
+                            expensesMap[dateStr] = (expensesMap[dateStr] ?: 0.0) + t.amount
+                        }
+
+                        balancesMap[dateStr] = totalBalance
                     }
 
-                    balancesMap[dateStr] = totalBalance
-                }
+                    currentTotalBalance = totalBalance
+                    dailyBalancesMap = balancesMap
+                    dailyExpensesMap = expensesMap
+                    dailyIncomesMap = incomesMap
 
-                currentTotalBalance = totalBalance
-                dailyBalancesMap = balancesMap
-                dailyExpensesMap = expensesMap
-                dailyIncomesMap = incomesMap
+                    if (isBalanceVisible) {
+                        tvTotalBalance.text =
+                            String.format(Locale.US, "%.2f ₴", currentTotalBalance)
+                    }
 
-                if (isBalanceVisible) {
-                    tvTotalBalance.text = String.format(Locale.US, "%.2f ₴", currentTotalBalance)
+                    if (::transactionAdapter.isInitialized) {
+                        transactionAdapter.updateDailyStats(
+                            dailyBalancesMap,
+                            dailyExpensesMap,
+                            dailyIncomesMap
+                        )
+                    }
                 }
-
-                if (::transactionAdapter.isInitialized) {
-                    // Змінюємо виклик функції, передаючи ще й доходи
-                    transactionAdapter.updateDailyStats(dailyBalancesMap, dailyExpensesMap, dailyIncomesMap)
-                }
-            }
     }
 
     private fun loadTransactions() {
@@ -638,43 +661,42 @@ class MainActivity : AppCompatActivity() {
         val limitedQuery = if (isAllLoaded) orderedQuery else orderedQuery.limit(currentLimit)
 
         snapshotListener = limitedQuery.addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    Toast.makeText(this, "Помилка завантаження даних", Toast.LENGTH_SHORT)
-                        .show()
-                    return@addSnapshotListener
-                }
-
-                if (snapshot != null) {
-                    val transactionsList = mutableListOf<Transaction>()
-
-                    for (document in snapshot.documents) {
-                        val transaction = document.toObject(Transaction::class.java)
-                        if (transaction != null) {
-                            transactionsList.add(transaction)
-                        }
-                    }
-
-                    currentTransactions = transactionsList
-                    applyFiltersAndSort()
-
-                    if (isScrollDownRequested) {
-                        isScrollDownRequested = false
-                        val lastIndex = transactionAdapter.itemCount - 1
-                        if (lastIndex >= 0) {
-                            rvTransactions.post {
-                                // Ось тут магія: scrollToPosition замість smoothScrollToPosition
-                                rvTransactions.scrollToPosition(lastIndex)
-                            }
-                        }
-                    }
-
-                    val validSelectedIds =
-                        transactionAdapter.selectedIds.filter { id -> transactionsList.any { it.id == id } }
-                    transactionAdapter.selectedIds.clear()
-                    transactionAdapter.selectedIds.addAll(validSelectedIds)
-                    updateSelectionUI()
-                }
+            if (error != null) {
+                Toast.makeText(this, "Помилка завантаження даних", Toast.LENGTH_SHORT)
+                    .show()
+                return@addSnapshotListener
             }
+
+            if (snapshot != null) {
+                val transactionsList = mutableListOf<Transaction>()
+
+                for (document in snapshot.documents) {
+                    val transaction = document.toObject(Transaction::class.java)
+                    if (transaction != null) {
+                        transactionsList.add(transaction)
+                    }
+                }
+
+                currentTransactions = transactionsList
+                applyFiltersAndSort()
+
+                if (isScrollDownRequested) {
+                    isScrollDownRequested = false
+                    val lastIndex = transactionAdapter.itemCount - 1
+                    if (lastIndex >= 0) {
+                        rvTransactions.post {
+                            rvTransactions.scrollToPosition(lastIndex)
+                        }
+                    }
+                }
+
+                val validSelectedIds =
+                    transactionAdapter.selectedIds.filter { id -> transactionsList.any { it.id == id } }
+                transactionAdapter.selectedIds.clear()
+                transactionAdapter.selectedIds.addAll(validSelectedIds)
+                updateSelectionUI()
+            }
+        }
     }
 
     private fun showTransactionDetailsBottomSheet(transaction: Transaction) {
@@ -774,6 +796,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun dispatchTouchEvent(event: android.view.MotionEvent): Boolean {
+        (application as? MyFinanceApp)?.resetInactivityTimer()
+
         if (event.action == android.view.MotionEvent.ACTION_DOWN) {
             val currentFocus = currentFocus
             if (currentFocus is com.google.android.material.textfield.TextInputEditText) {
@@ -781,7 +805,8 @@ class MainActivity : AppCompatActivity() {
                 currentFocus.getGlobalVisibleRect(outRect)
                 if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
                     currentFocus.clearFocus()
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                    val imm =
+                        getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
                     imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
                 }
             }

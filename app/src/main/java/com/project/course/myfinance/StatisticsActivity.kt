@@ -120,7 +120,20 @@ class StatisticsActivity : AppCompatActivity() {
             cal.get(java.util.Calendar.YEAR) == currentYear
         }
 
-        val monthNames = arrayOf("Січ", "Лют", "Бер", "Кві", "Тра", "Чер", "Лип", "Сер", "Вер", "Жов", "Лис", "Гру")
+        val monthNames = arrayOf(
+            "Січ",
+            "Лют",
+            "Бер",
+            "Кві",
+            "Тра",
+            "Чер",
+            "Лип",
+            "Сер",
+            "Вер",
+            "Жов",
+            "Лис",
+            "Гру"
+        )
         val incomeEntries = ArrayList<BarEntry>()
         val expenseEntries = ArrayList<BarEntry>()
 
@@ -129,8 +142,10 @@ class StatisticsActivity : AppCompatActivity() {
                 cal.timeInMillis = it.date
                 cal.get(java.util.Calendar.MONTH) == month
             }
-            val mIncome = monthTransactions.filter { it.type == "income" }.sumOf { it.amount }.toFloat()
-            val mExpense = monthTransactions.filter { it.type == "expense" }.sumOf { it.amount }.toFloat()
+            val mIncome =
+                monthTransactions.filter { it.type == "income" }.sumOf { it.amount }.toFloat()
+            val mExpense =
+                monthTransactions.filter { it.type == "expense" }.sumOf { it.amount }.toFloat()
 
             incomeEntries.add(BarEntry(month.toFloat(), mIncome))
             expenseEntries.add(BarEntry(month.toFloat(), mExpense))
@@ -178,19 +193,30 @@ class StatisticsActivity : AppCompatActivity() {
         val difference = recentIncome - recentExpense
 
         if (difference >= 0) {
-            // Змінюємо ТУТ
             ivTrendArrow.setImageResource(R.drawable.ic_arrow_up_flat)
             ivTrendArrow.setColorFilter(Color.parseColor("#4CAF50"))
-            tvTrendText.text = String.format(Locale.US, "Чудово! Ваші доходи перевищують витрати на %.2f ₴.", difference)
+            tvTrendText.text = String.format(
+                Locale.US,
+                "Чудово! Ваші доходи перевищують витрати на %.2f ₴.",
+                difference
+            )
         } else {
-            // І Змінюємо ТУТ
             ivTrendArrow.setImageResource(R.drawable.ic_arrow_down_flat)
             ivTrendArrow.setColorFilter(Color.parseColor("#F44336"))
-            tvTrendText.text = String.format(Locale.US, "Увага! Ваші витрати перевищують доходи на %.2f ₴.", abs(difference))
+            tvTrendText.text = String.format(
+                Locale.US,
+                "Увага! Ваші витрати перевищують доходи на %.2f ₴.",
+                abs(difference)
+            )
         }
     }
 
-    private fun buildPieChart(transactions: List<Transaction>, type: String, chart: PieChart, cardView: CardView) {
+    private fun buildPieChart(
+        transactions: List<Transaction>,
+        type: String,
+        chart: PieChart,
+        cardView: CardView
+    ) {
         val filtered = transactions.filter { it.type == type }
 
         val groupedByCategory = filtered.groupBy { it.category }
@@ -249,8 +275,10 @@ class StatisticsActivity : AppCompatActivity() {
         for ((dateLabel, dayTransactions) in groupedByDate) {
             xAxisLabels.add(dateLabel)
 
-            val dailyIncome = dayTransactions.filter { it.type == "income" }.sumOf { it.amount }.toFloat()
-            val dailyExpense = dayTransactions.filter { it.type == "expense" }.sumOf { it.amount }.toFloat()
+            val dailyIncome =
+                dayTransactions.filter { it.type == "income" }.sumOf { it.amount }.toFloat()
+            val dailyExpense =
+                dayTransactions.filter { it.type == "expense" }.sumOf { it.amount }.toFloat()
 
             incomeEntries.add(BarEntry(index, dailyIncome))
             expenseEntries.add(BarEntry(index, dailyExpense))

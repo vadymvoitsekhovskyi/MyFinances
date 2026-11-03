@@ -36,8 +36,8 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cvBigProfile"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:layout_marginTop="16dp"
         android:clickable="true"
         android:focusable="true"
@@ -203,6 +203,27 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btnSetPin"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="Встановити PIN-код"
+                    app:cornerRadius="50dp" />
+
+                <Button
+                    android:id="@+id/btnRemovePin"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="Видалити PIN-код"
+                    android:textColor="#F44336"
+                    app:strokeColor="#F44336"
+                    android:visibility="gone"
+                    app:cornerRadius="50dp" />
 
                 <Button
                     android:id="@+id/btnLogout"

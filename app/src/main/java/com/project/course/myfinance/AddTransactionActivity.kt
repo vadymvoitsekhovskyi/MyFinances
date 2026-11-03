@@ -97,7 +97,8 @@ class AddTransactionActivity : AppCompatActivity() {
             if (category == "Інше") {
                 category = etCustomCategory.text.toString().trim()
                 if (category.isBlank()) {
-                    Toast.makeText(this, "Введіть власну назву категорії", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Введіть власну назву категорії", Toast.LENGTH_SHORT)
+                        .show()
                     return@setOnClickListener
                 }
             }
