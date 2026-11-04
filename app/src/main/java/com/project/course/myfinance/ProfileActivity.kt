@@ -161,9 +161,11 @@ class ProfileActivity : AppCompatActivity() {
                 ).apply { setMargins(0, 0, 0, 16) }
             }
             val input1 = com.google.android.material.textfield.TextInputEditText(this).apply {
-                inputType =
-                    android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                inputType = android.text.InputType.TYPE_CLASS_NUMBER
+                transformationMethod =
+                    android.text.method.PasswordTransformationMethod.getInstance()
                 filters = arrayOf(android.text.InputFilter.LengthFilter(16))
+                importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
             }
             til1.addView(input1)
 
@@ -176,9 +178,11 @@ class ProfileActivity : AppCompatActivity() {
                 )
             }
             val input2 = com.google.android.material.textfield.TextInputEditText(this).apply {
-                inputType =
-                    android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                inputType = android.text.InputType.TYPE_CLASS_NUMBER
+                transformationMethod =
+                    android.text.method.PasswordTransformationMethod.getInstance()
                 filters = arrayOf(android.text.InputFilter.LengthFilter(16))
+                importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
             }
             til2.addView(input2)
 
@@ -237,9 +241,12 @@ class ProfileActivity : AppCompatActivity() {
                 )
             }
             val input = com.google.android.material.textfield.TextInputEditText(this).apply {
-                inputType =
-                    android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                inputType = android.text.InputType.TYPE_CLASS_NUMBER
+
+                transformationMethod =
+                    android.text.method.PasswordTransformationMethod.getInstance()
                 filters = arrayOf(android.text.InputFilter.LengthFilter(16))
+                importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
             }
             til.addView(input)
             layout.addView(til)
@@ -254,9 +261,13 @@ class ProfileActivity : AppCompatActivity() {
             dialog.setOnShowListener {
                 val btnDelete = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 btnDelete.setOnClickListener {
+                    val enteredPin = input.text.toString()
                     val prefs =
                         getSharedPreferences("pin_prefs", android.content.Context.MODE_PRIVATE)
-                    if (input.text.toString() == prefs.getString("app_pin", "")) {
+
+                    if (enteredPin.isEmpty()) {
+                        Toast.makeText(this, "Заповніть поле", Toast.LENGTH_SHORT).show()
+                    } else if (enteredPin == prefs.getString("app_pin", "")) {
                         prefs.edit().remove("app_pin").apply()
                         Toast.makeText(this, "PIN-код видалено", Toast.LENGTH_SHORT).show()
                         updatePinButtons()
@@ -310,7 +321,36 @@ class ProfileActivity : AppCompatActivity() {
         btnBack.setOnClickListener { finish() }
         updateUI()
         loadAvatarFromFirestore()
-        cvBigProfile.setOnClickListener { showAvatarOptionsDialog() }
+
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        var isLongPress = false
+        val longClickRunnable = Runnable {
+            isLongPress = true
+            if (ivBigProfile.visibility == View.VISIBLE) {
+                showZoomedAvatar()
+            }
+        }
+
+        cvBigProfile.setOnTouchListener { _, event ->
+            when (event.action) {
+                android.view.MotionEvent.ACTION_DOWN -> {
+                    isLongPress = false
+                    handler.postDelayed(longClickRunnable, 500)
+                    true
+                }
+
+                android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
+                    handler.removeCallbacks(longClickRunnable)
+                    if (!isLongPress && event.action == android.view.MotionEvent.ACTION_UP) {
+                        showAvatarOptionsDialog()
+                    }
+                    true
+                }
+
+                else -> false
+            }
+        }
+
         btnChangeName.setOnClickListener { showChangeNameDialog() }
         btnChangeEmail.setOnClickListener { showChangeEmailDialog() }
         btnChangePassword.setOnClickListener { showChangePasswordDialog() }
@@ -318,6 +358,46 @@ class ProfileActivity : AppCompatActivity() {
         btnImportData.setOnClickListener { showImportDialog() }
         btnLogout.setOnClickListener { showLogoutDialog() }
         btnDeleteAccount.setOnClickListener { showDeleteAccountDialog() }
+    }
+
+    private fun showZoomedAvatar() {
+        val dialog = android.app.Dialog(this, android.R.style.Theme_Translucent_NoTitleBar)
+
+        val layout = android.widget.RelativeLayout(this).apply {
+            layoutParams = android.view.ViewGroup.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            setBackgroundColor(android.graphics.Color.parseColor("#CC000000"))
+            setOnClickListener { dialog.dismiss() }
+        }
+
+        val metrics = resources.displayMetrics
+        val marginPx = (32 * metrics.density).toInt()
+        val size = metrics.widthPixels - (2 * marginPx)
+
+        val cardView = androidx.cardview.widget.CardView(this).apply {
+            layoutParams = android.widget.RelativeLayout.LayoutParams(size, size).apply {
+                addRule(android.widget.RelativeLayout.CENTER_IN_PARENT)
+            }
+            radius = size / 2f
+            setCardBackgroundColor(android.graphics.Color.parseColor("#2E7D32"))
+            cardElevation = 0f
+        }
+
+        val imageView = android.widget.ImageView(this).apply {
+            layoutParams = android.view.ViewGroup.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+            setImageDrawable(ivBigProfile.drawable)
+        }
+
+        cardView.addView(imageView)
+        layout.addView(cardView)
+        dialog.setContentView(layout)
+        dialog.show()
     }
 
     override fun dispatchTouchEvent(event: android.view.MotionEvent): Boolean {
