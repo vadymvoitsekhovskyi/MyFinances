@@ -44,6 +44,7 @@ import java.util.Locale
 import java.util.TimeZone
 
 class MainActivity : AppCompatActivity() {
+    private var allAvailableCategories = listOf<String>()
     private lateinit var btnResetFilters: TextView
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
@@ -138,7 +139,12 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: android.text.Editable?) {
                 currentSearchQuery = s?.toString()?.trim() ?: ""
-                applyFiltersAndSort()
+                if (currentSearchQuery.isNotBlank()) {
+                    isAllLoaded = true
+                    loadTransactions()
+                } else {
+                    applyFiltersAndSort()
+                }
             }
         })
 
@@ -165,9 +171,15 @@ class MainActivity : AppCompatActivity() {
         btnScrollUp.setOnClickListener {
             rvTransactions.scrollToPosition(0)
 
-            if (isAllLoaded) {
+            val hasFilters = currentTypeFilter != "all" ||
+                    currentCategoryFilter != "all" ||
+                    currentSpecificDateFilter != null ||
+                    currentSearchQuery.isNotBlank() ||
+                    currentSortOrder != "desc"
+
+            if (isAllLoaded && !hasFilters) {
                 isAllLoaded = false
-                currentLimit = 10L
+                currentLimit = 30L
                 loadTransactions()
             }
         }
@@ -247,14 +259,14 @@ class MainActivity : AppCompatActivity() {
                     1 -> "expense"; 2 -> "income"; else -> "all"
                 }
                 btnFilterType.text = "Тип: ${options[which]}"
-                currentLimit = 100L
+                isAllLoaded = true
                 loadTransactions()
                 dialog.dismiss()
             }.show()
     }
 
     private fun showCategoryFilterDialog() {
-        val categories = currentTransactions.map { it.category }.distinct().sorted().toMutableList()
+        val categories = allAvailableCategories.toMutableList()
         categories.add(0, "Всі")
         val options = categories.toTypedArray()
         val checkedItem =
@@ -270,7 +282,7 @@ class MainActivity : AppCompatActivity() {
                 if (shortCat.length > 10 && which != 0) shortCat = shortCat.substring(0, 10) + "..."
 
                 btnFilterCategory.text = if (which == 0) "Категорія: Всі" else shortCat
-                currentLimit = 100L
+                isAllLoaded = true
                 loadTransactions()
                 dialog.dismiss()
             }.show()
@@ -298,7 +310,7 @@ class MainActivity : AppCompatActivity() {
                 val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
                 btnFilterSpecificDate.text = "Дата: ${sdf.format(selectedCalendar.time)}"
 
-                currentLimit = 10L
+                isAllLoaded = true
                 loadTransactions()
             }, year, month, day)
 
@@ -307,7 +319,7 @@ class MainActivity : AppCompatActivity() {
         datePickerDialog.setButton(DatePickerDialog.BUTTON_NEUTRAL, "Очистити") { _, _ ->
             currentSpecificDateFilter = null
             btnFilterSpecificDate.text = "Дата: Всі"
-            currentLimit = 10L
+            isAllLoaded = true
             loadTransactions()
         }
 
@@ -338,7 +350,7 @@ class MainActivity : AppCompatActivity() {
                     2 -> "Без комент."
                     else -> "Сорт: Нові"
                 }
-                currentLimit = 100L
+                isAllLoaded = true
                 loadTransactions()
                 dialog.dismiss()
             }.show()
@@ -597,6 +609,7 @@ class MainActivity : AppCompatActivity() {
                     val allTrans =
                         snapshot.documents.mapNotNull { it.toObject(Transaction::class.java) }
                     val sortedTrans = allTrans.sortedBy { it.date }
+                    allAvailableCategories = allTrans.map { it.category }.distinct().sorted()
 
                     var totalBalance = 0.0
                     val balancesMap = mutableMapOf<String, Double>()
