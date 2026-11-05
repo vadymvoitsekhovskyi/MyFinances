@@ -61,4 +61,5 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.vanniktech:android-image-cropper:4.6.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("androidx.biometric:biometric:1.1.0")
 }

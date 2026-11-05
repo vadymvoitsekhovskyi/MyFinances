@@ -4,100 +4,153 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.textfield.TextInputEditText
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 
 class PinAuthActivity : AppCompatActivity() {
     private var attempts = 0
     private var timer: CountDownTimer? = null
 
+    private var currentPin = ""
+    private var isLocked = false
+    private lateinit var tvPinDisplay: TextView
+    private lateinit var savedPin: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pin_auth)
 
-        val etPin = findViewById<TextInputEditText>(R.id.etPin)
-
-        etPin.transformationMethod = android.text.method.PasswordTransformationMethod.getInstance()
-
+        tvPinDisplay = findViewById(R.id.tvPinDisplay)
         val tvError = findViewById<TextView>(R.id.tvError)
 
         val prefs = getSharedPreferences("pin_prefs", Context.MODE_PRIVATE)
-        val savedPin = prefs.getString("app_pin", null)
+        val pin = prefs.getString("app_pin", null)
 
-        if (savedPin == null) {
+        if (pin == null) {
             proceed()
             return
         }
+        savedPin = pin
 
-        checkLockoutState(etPin, tvError)
+        checkLockoutState(tvError)
+        setupKeypad(tvError, prefs)
+        setupBiometricAuth() // Одразу пропонуємо відбиток при вході
+    }
 
-        etPin.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    private fun setupKeypad(tvError: TextView, prefs: android.content.SharedPreferences) {
+        val numberButtons = listOf(
+            R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4,
+            R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9
+        )
 
-            override fun afterTextChanged(s: Editable?) {
-                val input = s.toString()
-
-                if (tvError.visibility == View.VISIBLE && input.length < savedPin.length) {
+        numberButtons.forEach { id ->
+            findViewById<View>(id).setOnClickListener { view ->
+                if (!isLocked && currentPin.length < savedPin.length) {
+                    val digit = (view as Button).text.toString()
+                    currentPin += digit
+                    updatePinDisplay()
                     tvError.visibility = View.GONE
-                }
 
-                if (input.length == savedPin.length) {
-                    if (input == savedPin) {
-                        prefs.edit().putInt("pin_attempts", 0)
-                            .putLong("last_active_time", System.currentTimeMillis()).apply()
-                        proceed()
-                    } else {
-                        etPin.text?.clear()
-                        attempts = prefs.getInt("pin_attempts", 0) + 1
-                        prefs.edit().putInt("pin_attempts", attempts).apply()
-
-                        if (attempts >= 3) {
-                            val lockTime = System.currentTimeMillis() + 60_000
-                            prefs.edit().putLong("pin_lock_time", lockTime).apply()
-                            checkLockoutState(etPin, tvError)
-                        } else {
-                            tvError.text = "Невірний PIN-код. Залишилось спроб: ${3 - attempts}"
-                            tvError.visibility = View.VISIBLE
-                        }
+                    if (currentPin.length == savedPin.length) {
+                        verifyPin(tvError, prefs)
                     }
                 }
             }
-        })
+        }
+
+        findViewById<View>(R.id.btnBackspace).setOnClickListener {
+            if (!isLocked && currentPin.isNotEmpty()) {
+                currentPin = currentPin.dropLast(1)
+                updatePinDisplay()
+            }
+        }
+
+        findViewById<View>(R.id.btnBiometric).setOnClickListener {
+            if (!isLocked) setupBiometricAuth()
+        }
     }
 
-    private fun checkLockoutState(etPin: TextInputEditText, tvError: TextView) {
+    private fun updatePinDisplay() {
+        tvPinDisplay.text = "•".repeat(currentPin.length)
+    }
+
+    private fun verifyPin(tvError: TextView, prefs: android.content.SharedPreferences) {
+        if (currentPin == savedPin) {
+            prefs.edit().putInt("pin_attempts", 0)
+                .putLong("last_active_time", System.currentTimeMillis()).apply()
+            proceed()
+        } else {
+            currentPin = ""
+            updatePinDisplay()
+            attempts = prefs.getInt("pin_attempts", 0) + 1
+            prefs.edit().putInt("pin_attempts", attempts).apply()
+
+            if (attempts >= 3) {
+                val lockTime = System.currentTimeMillis() + 60_000
+                prefs.edit().putLong("pin_lock_time", lockTime).apply()
+                checkLockoutState(tvError)
+            } else {
+                tvError.text = "Невірний PIN-код. Залишилось спроб: ${3 - attempts}"
+                tvError.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun checkLockoutState(tvError: TextView) {
         val prefs = getSharedPreferences("pin_prefs", Context.MODE_PRIVATE)
         val lockTime = prefs.getLong("pin_lock_time", 0L)
         val currentTime = System.currentTimeMillis()
 
         if (currentTime < lockTime) {
-            etPin.isEnabled = false
+            isLocked = true
             tvError.visibility = View.VISIBLE
 
             timer = object : CountDownTimer(lockTime - currentTime, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     tvError.text =
-                        "Цей додаток заблоковано. Повторіть спробу через ${millisUntilFinished / 1000} с."
+                        "Додаток заблоковано. Повторіть через ${millisUntilFinished / 1000} с."
                 }
 
                 override fun onFinish() {
-                    etPin.isEnabled = true
+                    isLocked = false
                     tvError.visibility = View.GONE
                     prefs.edit().putInt("pin_attempts", 0).apply()
                     attempts = 0
                 }
             }.start()
         } else {
-            etPin.isEnabled = true
+            isLocked = false
             tvError.visibility = View.GONE
             prefs.edit().putInt("pin_attempts", 0).apply()
             attempts = 0
         }
+    }
+
+    private fun setupBiometricAuth() {
+        val executor = ContextCompat.getMainExecutor(this)
+        val biometricPrompt = BiometricPrompt(
+            this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    getSharedPreferences("pin_prefs", Context.MODE_PRIVATE)
+                        .edit().putInt("pin_attempts", 0)
+                        .putLong("last_active_time", System.currentTimeMillis()).apply()
+                    proceed()
+                }
+            })
+
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Розблокування MyFinances")
+            .setSubtitle("Увійдіть за допомогою відбитка пальця")
+            .setNegativeButtonText("Використати PIN-код")
+            .build()
+
+        biometricPrompt.authenticate(promptInfo)
     }
 
     private fun proceed() {

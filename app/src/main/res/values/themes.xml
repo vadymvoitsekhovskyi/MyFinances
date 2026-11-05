@@ -5,5 +5,14 @@
         <item name="android:fontFamily">@font/ibm_plex_serif</item>
         <item name="fontFamily">@font/ibm_plex_serif</item>
     </style>
+    <style name="PinButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_width">72dp</item>
+        <item name="android:layout_height">72dp</item>
+        <item name="cornerRadius">36dp</item>
+        <item name="android:textSize">28sp</item>
+        <item name="backgroundTint">#AFAFAF</item>
+        <item name="android:textColor">#212121</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
     <style name="Theme.MyFinance" parent="Base.Theme.MyFinance" />
 </resources>

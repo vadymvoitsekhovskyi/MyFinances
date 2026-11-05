@@ -9,7 +9,7 @@
         android:id="@+id/tvPinTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="80dp"
         android:text="Введіть PIN-код"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -17,28 +17,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilPin"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/tvPinDisplay"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        app:endIconMode="password_toggle"
+        android:gravity="center"
+        android:letterSpacing="0.4"
+        android:text=""
+        android:textColor="#212121"
+        android:textSize="48sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvPinTitle">
+        app:layout_constraintTop_toBottomOf="@id/tvPinTitle" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etPin"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:hint="****"
-            android:inputType="number"
-            android:maxLength="16"
-            android:textAlignment="center"
-            android:textSize="24sp"
-            android:importantForAutofill="no" />
-    </com.google.android.material.textfield.TextInputLayout>
+    <View
+        android:id="@+id/vPinUnderline"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginTop="4dp"
+        android:background="#BDBDBD"
+        app:layout_constraintEnd_toEndOf="@id/tvPinDisplay"
+        app:layout_constraintStart_toStartOf="@id/tvPinDisplay"
+        app:layout_constraintTop_toBottomOf="@id/tvPinDisplay" />
 
     <TextView
         android:id="@+id/tvError"
@@ -50,6 +52,59 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tilPin" />
+        app:layout_constraintTop_toBottomOf="@id/vPinUnderline" />
+
+    <GridLayout
+        android:id="@+id/keypad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:columnCount="3"
+        android:rowCount="4"
+        android:useDefaultMargins="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button android:id="@+id/btn1" style="@style/PinButton" android:text="1" />
+        <Button android:id="@+id/btn2" style="@style/PinButton" android:text="2" />
+        <Button android:id="@+id/btn3" style="@style/PinButton" android:text="3" />
+
+        <Button android:id="@+id/btn4" style="@style/PinButton" android:text="4" />
+        <Button android:id="@+id/btn5" style="@style/PinButton" android:text="5" />
+        <Button android:id="@+id/btn6" style="@style/PinButton" android:text="6" />
+
+        <Button android:id="@+id/btn7" style="@style/PinButton" android:text="7" />
+        <Button android:id="@+id/btn8" style="@style/PinButton" android:text="8" />
+        <Button android:id="@+id/btn9" style="@style/PinButton" android:text="9" />
+
+
+        <ImageButton
+            android:id="@+id/btnBiometric"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_fingerprint"
+            app:tint="#757575"
+            android:padding="22dp"
+            android:scaleType="fitCenter"
+            android:elevation="0dp" />
+
+        <Button
+            android:id="@+id/btn0"
+            style="@style/PinButton"
+            android:text="0" />
+
+        <ImageButton
+            android:id="@+id/btnBackspace"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:src="@android:drawable/ic_input_delete"
+            app:tint="#757575"
+            android:padding="22dp"
+            android:scaleType="fitCenter"
+            android:elevation="0dp" />
+    </GridLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
