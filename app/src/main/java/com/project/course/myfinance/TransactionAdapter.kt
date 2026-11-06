@@ -26,6 +26,8 @@ class TransactionAdapter(
     private var dailyExpenses: Map<String, Double> = emptyMap()
     private var dailyIncomes: Map<String, Double> = emptyMap()
 
+    private var isHistoricalBalancesVisible = false
+
     class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvYearHeader: TextView = itemView.findViewById(R.id.tvYearHeader)
         val layoutDateHeader: LinearLayout = itemView.findViewById(R.id.layoutDateHeader)
@@ -94,8 +96,18 @@ class TransactionAdapter(
             val endOfDayBalance = dailyBalances[currentExactDateStr]
             if (endOfDayBalance != null) {
                 holder.tvHistoricalBalance.visibility = View.VISIBLE
-                holder.tvHistoricalBalance.text =
-                    String.format(Locale.US, "Баланс: %.2f ₴", endOfDayBalance)
+
+                if (isHistoricalBalancesVisible) {
+                    holder.tvHistoricalBalance.text =
+                        String.format(Locale.US, "Баланс: %.2f ₴", endOfDayBalance)
+                } else {
+                    holder.tvHistoricalBalance.text = "Баланс: ••••• ₴"
+                }
+
+                holder.tvHistoricalBalance.setOnClickListener {
+                    isHistoricalBalancesVisible = !isHistoricalBalancesVisible
+                    notifyDataSetChanged()
+                }
             } else {
                 holder.tvHistoricalBalance.visibility = View.GONE
             }

@@ -193,21 +193,21 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        app:startIconDrawable="@android:drawable/ic_menu_search"
-        app:startIconTint="@color/primary_green"
-        app:hintEnabled="true"
         android:hint="Пошук за категорією, коментарем або сумою"
+        app:hintEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardBalance">
+        app:layout_constraintTop_toBottomOf="@id/cardBalance"
+        app:startIconDrawable="@android:drawable/ic_menu_search"
+        app:startIconTint="@color/primary_green">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:imeOptions="actionSearch"
             android:inputType="text"
-            android:maxLines="1"
-            android:imeOptions="actionSearch" />
+            android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <HorizontalScrollView
@@ -215,9 +215,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:scrollbars="none"
         android:clipToPadding="false"
         android:paddingHorizontal="16dp"
+        android:scrollbars="none"
         app:layout_constraintTop_toBottomOf="@id/tilSearch">
 
         <LinearLayout
@@ -230,30 +230,30 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:text="Тип: Всі"
                 android:textColor="#757575"
-                app:strokeColor="#BDBDBD"
-                android:layout_marginEnd="8dp"/>
+                app:strokeColor="#BDBDBD" />
 
             <Button
                 android:id="@+id/btnFilterCategory"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:text="Категорія: Всі"
                 android:textColor="#757575"
-                app:strokeColor="#BDBDBD"
-                android:layout_marginEnd="8dp"/>
+                app:strokeColor="#BDBDBD" />
 
             <Button
                 android:id="@+id/btnFilterSpecificDate"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:text="Дата: Всі"
                 android:textColor="#757575"
-                app:strokeColor="#BDBDBD"
-                android:layout_marginEnd="8dp"/>
+                app:strokeColor="#BDBDBD" />
 
             <Button
                 android:id="@+id/btnSortDate"
@@ -262,7 +262,7 @@
                 android:layout_height="wrap_content"
                 android:text="Сорт: Нові"
                 android:textColor="#757575"
-                app:strokeColor="#BDBDBD"/>
+                app:strokeColor="#BDBDBD" />
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -338,10 +338,10 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/arrow_up_float"
-            app:tint="@color/primary_green"
             android:elevation="0dp"
-            android:stateListAnimator="@null" />
+            android:src="@android:drawable/arrow_up_float"
+            android:stateListAnimator="@null"
+            app:tint="@color/primary_green" />
 
         <ImageButton
             android:id="@+id/btnScrollDown"
@@ -349,10 +349,10 @@
             android:layout_height="48dp"
             android:layout_marginStart="4dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/arrow_down_float"
-            app:tint="@color/primary_green"
             android:elevation="0dp"
-            android:stateListAnimator="@null" />
+            android:src="@android:drawable/arrow_down_float"
+            android:stateListAnimator="@null"
+            app:tint="@color/primary_green" />
 
         <View
             android:layout_width="0dp"
@@ -367,7 +367,40 @@
             android:background="@drawable/bg_add_button"
             android:src="@android:drawable/ic_input_add"
             app:tint="#FFFFFF" />
-
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/layoutNoInternet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E6F8F9FA"
+        android:clickable="true"
+        android:elevation="20dp"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:indeterminateTint="@color/primary_green" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Очікування мережі..."
+            android:textColor="#2E7D32"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Перевірте з'єднання з інтернетом"
+            android:textColor="#757575"
+            android:textSize="14sp" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

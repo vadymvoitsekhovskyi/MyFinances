@@ -42,8 +42,16 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var layoutNoInternet: LinearLayout
+    private var connectivityManager: ConnectivityManager? = null
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var allAvailableCategories = listOf<String>()
     private lateinit var btnResetFilters: TextView
     private val auth = FirebaseAuth.getInstance()
@@ -96,6 +104,9 @@ class MainActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        layoutNoInternet = findViewById(R.id.layoutNoInternet)
+        setupNetworkMonitoring()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -234,6 +245,41 @@ class MainActivity : AppCompatActivity() {
         loadTransactions()
         updateProfileIcon()
         startAnimatedIconsLoop()
+    }
+
+    private fun setupNetworkMonitoring() {
+        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        networkCallback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                runOnUiThread {
+                    layoutNoInternet.visibility = View.GONE
+                    loadTotalBalance()
+                    loadTransactions()
+                }
+            }
+
+            override fun onLost(network: Network) {
+                runOnUiThread {
+                    layoutNoInternet.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+
+        connectivityManager?.registerNetworkCallback(networkRequest, networkCallback!!)
+
+        val activeNetwork = connectivityManager?.activeNetwork
+        val capabilities = connectivityManager?.getNetworkCapabilities(activeNetwork)
+        val hasInternet =
+            capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+
+        if (!hasInternet) {
+            layoutNoInternet.visibility = View.VISIBLE
+        }
     }
 
     private fun toggleBalanceVisibility() {
@@ -541,6 +587,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         snapshotListener?.remove()
         balanceListener?.remove()
+        networkCallback?.let { connectivityManager?.unregisterNetworkCallback(it) }
     }
 
     private fun updateProfileIcon() {
