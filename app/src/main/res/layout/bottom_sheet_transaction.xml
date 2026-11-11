@@ -137,6 +137,9 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:text="Редагувати"
+
+            android:textAllCaps="false"
+
             android:textColor="@color/primary_green"
             app:strokeColor="@color/primary_green"
             app:cornerRadius="50dp" />

@@ -4,6 +4,10 @@
         <item name="colorSecondary">@color/primary_green_light</item>
         <item name="android:fontFamily">@font/ibm_plex_serif</item>
         <item name="fontFamily">@font/ibm_plex_serif</item>
+
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="materialButtonStyle">@style/Widget.Material3.Button.UnelevatedButton</item>
+
     </style>
     <style name="PinButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:layout_width">72dp</item>
