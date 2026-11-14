@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity() {
     private var currentLimit: Long = 30L
     private var isAllLoaded = false
     private var isScrollDownRequested = false
+    private var isSelectAllPending = false
     private var snapshotListener: ListenerRegistration? = null
     private var balanceListener: ListenerRegistration? = null
     private var currentTypeFilter = "all"
@@ -188,7 +189,7 @@ class MainActivity : AppCompatActivity() {
                     currentSearchQuery.isNotBlank() ||
                     currentSortOrder != "desc"
 
-            if (isAllLoaded && !hasFilters) {
+            if (isAllLoaded && !hasFilters && transactionAdapter.selectedIds.isEmpty()) {
                 isAllLoaded = false
                 currentLimit = 30L
                 loadTransactions()
@@ -233,8 +234,14 @@ class MainActivity : AppCompatActivity() {
         btnCloseSelection.setOnClickListener { clearSelection() }
 
         btnSelectAll.setOnClickListener {
-            transactionAdapter.selectAll()
-            updateSelectionUI()
+            if (!isAllLoaded) {
+                isSelectAllPending = true
+                isAllLoaded = true
+                loadTransactions()
+            } else {
+                transactionAdapter.selectAll()
+                updateSelectionUI()
+            }
         }
 
         btnDeleteSelected.setOnClickListener {
@@ -694,6 +701,7 @@ class MainActivity : AppCompatActivity() {
 
         snapshotListener = limitedQuery.addSnapshotListener { snapshot, error ->
             if (error != null) {
+                isSelectAllPending = false
                 Toast.makeText(this, "Помилка завантаження даних", Toast.LENGTH_SHORT)
                     .show()
                 return@addSnapshotListener
@@ -711,6 +719,11 @@ class MainActivity : AppCompatActivity() {
 
                 currentTransactions = transactionsList
                 applyFiltersAndSort()
+
+                if (isSelectAllPending) {
+                    isSelectAllPending = false
+                    transactionAdapter.selectAll()
+                }
 
                 if (isScrollDownRequested) {
                     isScrollDownRequested = false
