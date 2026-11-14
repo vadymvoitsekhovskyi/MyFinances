@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="@color/background_main">
 
     <LinearLayout
         android:id="@+id/toolbar"
@@ -18,40 +18,102 @@
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Назад"
+            android:padding="2dp"
             android:src="@drawable/ic_back_arrow" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Статистика"
+            android:text="Аналітика та звіт"
+            android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold" />
     </LinearLayout>
 
+    <HorizontalScrollView
+        android:id="@+id/periodScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnPeriod30Days"
+                style="@style/GlossyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:text="30 днів"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btnPeriodMonth"
+                style="@style/GlossyOutlineButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:text="Цей місяць"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btnPeriodYear"
+                style="@style/GlossyOutlineButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:text="Цей рік"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btnPeriodAll"
+                style="@style/GlossyOutlineButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Весь час"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintTop_toBottomOf="@id/periodScroll">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp">
 
+            <!-- Картка зведеної звітності за період -->
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardTrend"
+                android:id="@+id/cardSummaryReport"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:visibility="gone"
                 app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="14dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
@@ -62,10 +124,11 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:id="@+id/tvReportPeriodTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Тенденція (останні 30 днів)"
-                        android:textColor="#757575"
+                        android:text="Звіт за останні 30 днів"
+                        android:textColor="@color/text_secondary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -73,37 +136,128 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:id="@+id/ivTrendArrow"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_arrow_up_flat"
-                            app:tint="@color/dark_green" />
-
-                        <TextView
-                            android:id="@+id/tvTrendText"
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
                             android:layout_weight="1"
-                            android:text="Доходи перевищують витрати"
-                            android:textColor="#212121"
-                            android:textSize="16sp" />
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Доходи"
+                                android:textColor="@color/text_muted"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvReportIncome"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="+ 0.00 ₴"
+                                android:textColor="@color/dark_green"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Витрати"
+                                android:textColor="@color/text_muted"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvReportExpense"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="- 0.00 ₴"
+                                android:textColor="@color/dark_red"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="#E0E4E8" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Чистий результат"
+                                android:textColor="@color/text_muted"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvReportNet"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="0.00 ₴"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Середні витрати/день"
+                                android:textColor="@color/text_muted"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvReportAvgDaily"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="0.00 ₴"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Розумна фінансова підказка -->
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardIncomePie"
+                android:id="@+id/cardTrend"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:visibility="gone"
                 app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="14dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
@@ -116,18 +270,40 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Доходи за категоріями"
-                        android:textSize="18sp"
+                        android:text="Фінансовий аналіз"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
-                    <com.github.mikephil.charting.charts.PieChart
-                        android:id="@+id/incomePieChart"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="400dp"
-                        android:layout_marginTop="16dp" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/ivTrendArrow"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_arrow_up_flat"
+                            app:tint="@color/dark_green" />
+
+                        <TextView
+                            android:id="@+id/tvTrendText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:lineSpacingExtra="2dp"
+                            android:text="Доходи перевищують витрати"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp" />
+                    </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Витрати за категоріями + список -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardExpensePie"
                 android:layout_width="match_parent"
@@ -135,7 +311,7 @@
                 android:layout_marginBottom="16dp"
                 android:visibility="gone"
                 app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="14dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
@@ -149,23 +325,34 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Витрати за категоріями"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <com.github.mikephil.charting.charts.PieChart
                         android:id="@+id/expensePieChart"
                         android:layout_width="match_parent"
-                        android:layout_height="400dp"
-                        android:layout_marginTop="16dp" />
+                        android:layout_height="270dp"
+                        android:layout_marginTop="12dp" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutExpenseBreakdown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Доходи за категоріями + список -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardIncomePie"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
                 app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="14dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
@@ -178,43 +365,143 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Доходи та витрати по днях"
+                        android:text="Доходи за категоріями"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <com.github.mikephil.charting.charts.BarChart
-                        android:id="@+id/barChart"
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/incomePieChart"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
-                        android:layout_marginTop="16dp" />
+                        android:layout_height="270dp"
+                        android:layout_marginTop="12dp" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutIncomeBreakdown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Динаміка по днях з прокруткою та вибором бару -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glossy_card"
                     android:orientation="vertical"
                     android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Рух коштів за поточний рік"
+                        android:text="Динаміка по днях"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvSelectedDayInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Натисніть на стовпчик для деталей"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
+
+                    <com.github.mikephil.charting.charts.BarChart
+                        android:id="@+id/barChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="280dp"
+                        android:layout_marginTop="12dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Річний звіт із перемикачем років -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glossy_card"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Рух коштів за рік"
+                            android:textColor="@color/text_primary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnPrevYear"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:gravity="center"
+                            android:text="◀"
+                            android:textColor="@color/dark_green"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/tvSelectedYear"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="8dp"
+                            android:text="2026"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnNextYear"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:gravity="center"
+                            android:text="▶"
+                            android:textColor="@color/dark_green"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvSelectedMonthInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Натисніть на місяць для перегляду сум"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
 
                     <com.github.mikephil.charting.charts.BarChart
                         android:id="@+id/yearlyBarChart"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
-                        android:layout_marginTop="16dp" />
+                        android:layout_height="280dp"
+                        android:layout_marginTop="12dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>

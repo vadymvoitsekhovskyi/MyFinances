@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_main"
     tools:context=".AddTransactionActivity">
 
     <LinearLayout
@@ -19,9 +20,11 @@
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Назад"
+            android:padding="2dp"
             android:src="@drawable/ic_back_arrow" />
 
         <TextView
@@ -30,6 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Нова транзакція"
+            android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -37,97 +41,177 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_glossy_card"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Тип операції"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
             <RadioGroup
                 android:id="@+id/radioGroupType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_segmented_container"
+                android:orientation="horizontal"
+                android:padding="4dp">
 
                 <RadioButton
                     android:id="@+id/rbExpense"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="44dp"
+                    android:layout_marginEnd="4dp"
                     android:layout_weight="1"
-                    android:buttonTint="@color/dark_red"
+                    android:background="@drawable/selector_type_expense"
+                    android:button="@null"
                     android:checked="true"
+                    android:gravity="center"
                     android:text="Витрата"
-                    android:textColor="@color/dark_red" />
+                    android:textColor="@color/dark_red"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <RadioButton
                     android:id="@+id/rbIncome"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="4dp"
                     android:layout_weight="1"
-                    android:buttonTint="@color/dark_green"
+                    android:background="@drawable/selector_type_income"
+                    android:button="@null"
+                    android:gravity="center"
                     android:text="Дохід"
-                    android:textColor="@color/dark_green" />
+                    android:textColor="@color/dark_green"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
             </RadioGroup>
 
-            <EditText
-                android:id="@+id/etAmount"
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:hint="Сума"
-                android:inputType="numberDecimal"
-                android:minHeight="48dp" />
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="@color/dark_green"
+                app:hintTextColor="@color/dark_green"
+                app:suffixText="₴"
+                app:suffixTextColor="@color/text_primary">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:hintEnabled="false">
+                android:hint="Категорія"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="@color/dark_green"
+                app:hintTextColor="@color/dark_green">
 
                 <AutoCompleteTextView
                     android:id="@+id/etCategory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Категорія"
                     android:inputType="none"
-                    android:minHeight="48dp" />
+                    android:minHeight="52dp"
+                    android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupQuickCategories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:singleLine="true" />
+            </HorizontalScrollView>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilCustomCategory"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:visibility="gone">
+                android:layout_marginTop="12dp"
+                android:hint="Власна назва категорії"
+                android:visibility="gone"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="@color/dark_green"
+                app:hintTextColor="@color/dark_green">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etCustomCategory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Введіть власну назву категорії"
                     android:inputType="textCapSentences" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <EditText
-                android:id="@+id/etComment"
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Коментар"
-                android:inputType="text|textCapSentences"
-                android:minHeight="48dp" />
+                android:hint="Коментар (необов'язково)"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="@color/dark_green"
+                app:hintTextColor="@color/dark_green">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etComment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text|textCapSentences"
+                    android:maxLines="3" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Button
                 android:id="@+id/btnSaveTransaction"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:text="Зберегти" />
+                android:layout_height="54dp"
+                android:layout_marginTop="28dp"
+                android:text="Зберегти"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
     </ScrollView>

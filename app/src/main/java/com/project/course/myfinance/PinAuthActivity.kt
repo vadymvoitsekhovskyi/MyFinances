@@ -53,7 +53,7 @@ class PinAuthActivity : AppCompatActivity() {
                     val digit = (view as Button).text.toString()
                     currentPin += digit
                     updatePinDisplay()
-                    tvError.visibility = View.GONE
+                    tvError.visibility = View.INVISIBLE
 
                     if (currentPin.length == savedPin.length) {
                         verifyPin(tvError, prefs)
@@ -117,14 +117,14 @@ class PinAuthActivity : AppCompatActivity() {
 
                 override fun onFinish() {
                     isLocked = false
-                    tvError.visibility = View.GONE
+                    tvError.visibility = View.INVISIBLE
                     prefs.edit().putInt("pin_attempts", 0).apply()
                     attempts = 0
                 }
             }.start()
         } else {
             isLocked = false
-            tvError.visibility = View.GONE
+            tvError.visibility = View.INVISIBLE
             prefs.edit().putInt("pin_attempts", 0).apply()
             attempts = 0
         }

@@ -3,15 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    android:background="@color/background_main">
+    android:background="@color/background_main"
+    android:padding="24dp">
 
     <TextView
         android:id="@+id/tvPinTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="40dp"
         android:text="Введіть PIN-код"
+        android:textColor="@color/text_primary"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,14 +21,14 @@
 
     <TextView
         android:id="@+id/tvPinDisplay"
-        android:layout_width="200dp"
+        android:layout_width="220dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:gravity="center"
         android:letterSpacing="0.4"
         android:text=""
-        android:textColor="#212121"
-        android:textSize="48sp"
+        android:textColor="@color/text_primary"
+        android:textSize="44sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,10 +48,12 @@
         android:id="@+id/tvError"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:gravity="center"
         android:textAlignment="center"
         android:textColor="@color/dark_red"
-        android:visibility="gone"
+        android:textSize="14sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/keypad"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/vPinUnderline" />
@@ -59,13 +62,14 @@
         android:id="@+id/keypad"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
         android:columnCount="3"
         android:rowCount="4"
         android:useDefaultMargins="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vPinUnderline"
+        app:layout_constraintVertical_bias="0.45">
 
         <Button android:id="@+id/btn1" style="@style/PinButton" android:text="1" />
         <Button android:id="@+id/btn2" style="@style/PinButton" android:text="2" />
@@ -79,19 +83,19 @@
         <Button android:id="@+id/btn8" style="@style/PinButton" android:text="8" />
         <Button android:id="@+id/btn9" style="@style/PinButton" android:text="9" />
 
-
         <ImageButton
             android:id="@+id/btnBiometric"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_margin="8dp"
+            android:layout_width="84dp"
+            android:layout_height="84dp"
+            android:layout_margin="10dp"
             android:background="@drawable/bg_glossy_pin"
+            android:contentDescription="Відбиток пальця"
             android:elevation="0dp"
             android:padding="22dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_fingerprint"
             android:stateListAnimator="@null"
-            app:tint="@color/text_secondary" />
+            app:tint="@color/dark_green" />
 
         <Button
             android:id="@+id/btn0"
@@ -100,12 +104,13 @@
 
         <ImageButton
             android:id="@+id/btnBackspace"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_margin="8dp"
+            android:layout_width="84dp"
+            android:layout_height="84dp"
+            android:layout_margin="10dp"
             android:background="@drawable/bg_glossy_pin"
+            android:contentDescription="Видалити символ"
             android:elevation="0dp"
-            android:padding="22dp"
+            android:padding="24dp"
             android:scaleType="fitCenter"
             android:src="@android:drawable/ic_input_delete"
             android:stateListAnimator="@null"

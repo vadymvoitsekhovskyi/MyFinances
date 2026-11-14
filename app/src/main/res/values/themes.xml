@@ -28,16 +28,17 @@
     </style>
 
     <style name="PinButton" parent="Widget.Material3.Button.UnelevatedButton">
-        <item name="android:layout_width">72dp</item>
-        <item name="android:layout_height">72dp</item>
-        <item name="android:textSize">28sp</item>
+        <item name="android:layout_width">84dp</item>
+        <item name="android:layout_height">84dp</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:elevation">0dp</item>
         <item name="elevation">0dp</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="backgroundTint">@null</item>
         <item name="android:background">@drawable/bg_glossy_pin</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:layout_margin">8dp</item>
+        <item name="android:layout_margin">10dp</item>
     </style>
 
     <style name="Theme.MyFinance" parent="Base.Theme.MyFinance" />

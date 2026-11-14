@@ -131,14 +131,18 @@
 
         <Button
             android:id="@+id/btnEdit"
-            style="@style/GlossyOutlineButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
+            android:background="@drawable/bg_glossy_outline_green"
+            android:elevation="0dp"
+            android:stateListAnimator="@null"
             android:text="Редагувати"
             android:textAllCaps="false"
-            android:textColor="@color/dark_green" />
+            android:textColor="@color/dark_green"
+            android:textStyle="bold"
+            app:backgroundTint="@null" />
 
         <Button
             android:id="@+id/btnDelete"

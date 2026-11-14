@@ -19,6 +19,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.course.myfinance.models.Transaction
 import java.util.UUID
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 
 class AddTransactionActivity : AppCompatActivity() {
     private val db = FirebaseFirestore.getInstance()
@@ -62,6 +64,28 @@ class AddTransactionActivity : AppCompatActivity() {
                 tilCustomCategory.visibility = View.GONE
                 etCustomCategory.setText("")
             }
+        }
+
+        val chipGroupQuickCategories = findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupQuickCategories)
+        val quickCategories = listOf("Кава", "Продукти", "Зарплата", "Дім", "Аптека", "Інше")
+
+        quickCategories.forEach { catName ->
+            val chip = com.google.android.material.chip.Chip(this).apply {
+                text = catName
+                isCheckable = false
+                setChipBackgroundColorResource(R.color.white_soft)
+                setTextColor(androidx.core.content.ContextCompat.getColor(this@AddTransactionActivity, R.color.text_primary))
+                setOnClickListener {
+                    etCategory.setText(catName, false)
+                    if (catName == "Інше") {
+                        tilCustomCategory.visibility = View.VISIBLE
+                    } else {
+                        tilCustomCategory.visibility = View.GONE
+                        etCustomCategory.setText("")
+                    }
+                }
+            }
+            chipGroupQuickCategories.addView(chip)
         }
 
         editingTransactionId = intent.getStringExtra("EXTRA_ID")
