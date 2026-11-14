@@ -470,49 +470,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateFilterButtonsStyle() {
-        val colorActiveText = Color.WHITE
-        val colorActiveBg = Color.parseColor("#2E7D32")
-        val colorInactiveText = Color.parseColor("#757575")
-        val colorTransparent = Color.TRANSPARENT
+        val buttons = listOf(
+            btnFilterType to (currentTypeFilter != "all"),
+            btnFilterCategory to (currentCategoryFilter != "all"),
+            btnFilterSpecificDate to (currentSpecificDateFilter != null),
+            btnSortDate to (currentSortOrder != "desc")
+        )
 
-        if (currentTypeFilter != "all") {
-            btnFilterType.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(colorActiveBg)
-            btnFilterType.setTextColor(colorActiveText)
-        } else {
-            btnFilterType.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(colorTransparent)
-            btnFilterType.setTextColor(colorInactiveText)
-        }
-
-        if (currentCategoryFilter != "all") {
-            btnFilterCategory.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(colorActiveBg)
-            btnFilterCategory.setTextColor(colorActiveText)
-        } else {
-            btnFilterCategory.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(colorTransparent)
-            btnFilterCategory.setTextColor(colorInactiveText)
-        }
-
-        if (currentSpecificDateFilter != null) {
-            btnFilterSpecificDate.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(colorActiveBg)
-            btnFilterSpecificDate.setTextColor(colorActiveText)
-        } else {
-            btnFilterSpecificDate.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(colorTransparent)
-            btnFilterSpecificDate.setTextColor(colorInactiveText)
-        }
-
-        if (currentSortOrder != "desc") {
-            btnSortDate.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(colorActiveBg)
-            btnSortDate.setTextColor(colorActiveText)
-        } else {
-            btnSortDate.backgroundTintList =
-                android.content.res.ColorStateList.valueOf(colorTransparent)
-            btnSortDate.setTextColor(colorInactiveText)
+        for ((button, isActive) in buttons) {
+            if (isActive) {
+                button.setBackgroundResource(R.drawable.bg_glossy_green)
+                button.setTextColor(Color.parseColor("#F4F6F8"))
+            } else {
+                button.setBackgroundResource(R.drawable.bg_glossy_outline)
+                button.setTextColor(Color.parseColor("#545B64"))
+            }
         }
     }
 

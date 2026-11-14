@@ -152,10 +152,10 @@ class StatisticsActivity : AppCompatActivity() {
         }
 
         val incomeDataSet = BarDataSet(incomeEntries, "Дохід")
-        incomeDataSet.color = Color.parseColor("#4CAF50")
+        incomeDataSet.color = Color.parseColor("#1B5E20")
 
         val expenseDataSet = BarDataSet(expenseEntries, "Витрата")
-        expenseDataSet.color = Color.parseColor("#F44336")
+        expenseDataSet.color = Color.parseColor("#B71C1C")
 
         val data = BarData(incomeDataSet, expenseDataSet)
         val barSpace = 0.05f
@@ -194,7 +194,7 @@ class StatisticsActivity : AppCompatActivity() {
 
         if (difference >= 0) {
             ivTrendArrow.setImageResource(R.drawable.ic_arrow_up_flat)
-            ivTrendArrow.setColorFilter(Color.parseColor("#4CAF50"))
+            ivTrendArrow.setColorFilter(Color.parseColor("#1B5E20"))
             tvTrendText.text = String.format(
                 Locale.US,
                 "Чудово! Ваші доходи перевищують витрати на %.2f ₴.",
@@ -202,7 +202,7 @@ class StatisticsActivity : AppCompatActivity() {
             )
         } else {
             ivTrendArrow.setImageResource(R.drawable.ic_arrow_down_flat)
-            ivTrendArrow.setColorFilter(Color.parseColor("#F44336"))
+            ivTrendArrow.setColorFilter(Color.parseColor("#B71C1C"))
             tvTrendText.text = String.format(
                 Locale.US,
                 "Увага! Ваші витрати перевищують доходи на %.2f ₴.",

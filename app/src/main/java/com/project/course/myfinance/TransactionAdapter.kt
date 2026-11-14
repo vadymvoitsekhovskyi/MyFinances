@@ -25,7 +25,11 @@ class TransactionAdapter(
     private var dailyBalances: Map<String, Double> = emptyMap()
     private var dailyExpenses: Map<String, Double> = emptyMap()
     private var dailyIncomes: Map<String, Double> = emptyMap()
-
+    private val timeZone = TimeZone.getTimeZone("Europe/Kyiv")
+    private val yearFormatter = SimpleDateFormat("yyyy", Locale("uk", "UA")).apply { this.timeZone = this@TransactionAdapter.timeZone }
+    private val dayMonthFormatter = SimpleDateFormat("dd MMMM", Locale("uk", "UA")).apply { this.timeZone = this@TransactionAdapter.timeZone }
+    private val exactDateFormatter = SimpleDateFormat("ddMMyyyy", Locale.getDefault()).apply { this.timeZone = this@TransactionAdapter.timeZone }
+    private val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault()).apply { this.timeZone = this@TransactionAdapter.timeZone }
     private var isHistoricalBalancesVisible = false
 
     class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -39,7 +43,7 @@ class TransactionAdapter(
         val tvComment: TextView = itemView.findViewById(R.id.tvComment)
         val tvTime: TextView = itemView.findViewById(R.id.tvTime)
         val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
-        val cardView: CardView = itemView.findViewById(R.id.cardTransaction)
+        val cardView: View = itemView.findViewById(R.id.cardTransaction)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
@@ -52,14 +56,7 @@ class TransactionAdapter(
         val transaction = transactions[position]
 
         val timeZone = TimeZone.getTimeZone("Europe/Kyiv")
-        val yearFormatter =
-            SimpleDateFormat("yyyy", Locale("uk", "UA")).apply { this.timeZone = timeZone }
-        val dayMonthFormatter =
-            SimpleDateFormat("dd MMMM", Locale("uk", "UA")).apply { this.timeZone = timeZone }
-        val exactDateFormatter =
-            SimpleDateFormat("ddMMyyyy", Locale.getDefault()).apply { this.timeZone = timeZone }
-        val timeFormatter =
-            SimpleDateFormat("HH:mm", Locale.getDefault()).apply { this.timeZone = timeZone }
+
 
         val currentDateObj = Date(transaction.date)
         val currentYearStr = yearFormatter.format(currentDateObj)
@@ -128,16 +125,16 @@ class TransactionAdapter(
 
         if (transaction.type == "income") {
             holder.tvAmount.text = String.format(Locale.US, "+ %.2f ₴", transaction.amount)
-            holder.tvAmount.setTextColor(Color.parseColor("#4CAF50"))
+            holder.tvAmount.setTextColor(Color.parseColor("#1B5E20"))
         } else {
             holder.tvAmount.text = String.format(Locale.US, "- %.2f ₴", transaction.amount)
-            holder.tvAmount.setTextColor(Color.parseColor("#F44336"))
+            holder.tvAmount.setTextColor(Color.parseColor("#B71C1C"))
         }
 
         if (selectedIds.contains(transaction.id)) {
-            holder.cardView.setCardBackgroundColor(Color.parseColor("#E8F5E9"))
+            holder.cardView.setBackgroundResource(R.drawable.bg_glossy_card_selected)
         } else {
-            holder.cardView.setCardBackgroundColor(Color.WHITE)
+            holder.cardView.setBackgroundResource(R.drawable.bg_glossy_card)
         }
 
         holder.cardView.setOnClickListener {

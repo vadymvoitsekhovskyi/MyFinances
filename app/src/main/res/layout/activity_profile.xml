@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
+    android:background="@color/background_main"
     tools:context=".ProfileActivity">
 
     <LinearLayout
@@ -40,16 +40,16 @@
         android:layout_height="0dp"
         android:layout_marginHorizontal="100dp"
         android:layout_marginTop="32dp"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        app:cardBackgroundColor="@color/primary_green"
+        app:cardBackgroundColor="@color/dark_green"
         app:cardCornerRadius="500dp"
-        app:cardElevation="0dp">
+        app:cardElevation="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <TextView
             android:id="@+id/tvBigProfileLetter"
@@ -100,9 +100,9 @@
         android:layout_marginTop="16dp"
         android:background="@android:color/transparent"
         app:layout_constraintTop_toBottomOf="@id/tvNameDisplay"
-        app:tabIndicatorColor="@color/primary_green"
-        app:tabSelectedTextColor="@color/primary_green"
-        app:tabTextColor="#757575">
+        app:tabIndicatorColor="@color/dark_green"
+        app:tabSelectedTextColor="@color/dark_green"
+        app:tabTextColor="@color/text_secondary">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
@@ -141,29 +141,29 @@
 
                 <Button
                     android:id="@+id/btnChangeName"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/GlossyOutlineButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="8dp"
                     android:text="Змінити ім'я"
-                    app:cornerRadius="50dp" />
+                    android:textColor="@color/text_primary" />
 
                 <Button
                     android:id="@+id/btnChangeEmail"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/GlossyOutlineButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="8dp"
                     android:text="Змінити email"
-                    app:cornerRadius="50dp" />
+                    android:textColor="@color/text_primary" />
 
                 <Button
                     android:id="@+id/btnChangePassword"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/GlossyOutlineButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Змінити пароль"
-                    app:cornerRadius="50dp" />
+                    android:textColor="@color/text_primary" />
             </LinearLayout>
 
             <LinearLayout
@@ -175,28 +175,20 @@
 
                 <Button
                     android:id="@+id/btnExportData"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/GlossyOutlineButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="8dp"
                     android:text="Експорт"
-                    android:textColor="#4CAF50"
-                    app:icon="@android:drawable/ic_menu_save"
-                    app:iconTint="#4CAF50"
-                    app:strokeColor="#4CAF50"
-                    app:cornerRadius="50dp" />
+                    android:textColor="@color/dark_green" />
 
                 <Button
                     android:id="@+id/btnImportData"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/GlossyOutlineButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Імпорт"
-                    android:textColor="#FF9800"
-                    app:icon="@android:drawable/ic_menu_upload"
-                    app:iconTint="#FF9800"
-                    app:strokeColor="#FF9800"
-                    app:cornerRadius="50dp" />
+                    android:textColor="@color/dark_orange" />
             </LinearLayout>
 
             <LinearLayout
@@ -208,42 +200,42 @@
 
                 <Button
                     android:id="@+id/btnSetPin"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/GlossyOutlineButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="8dp"
                     android:text="Встановити PIN-код"
-                    app:cornerRadius="50dp" />
+                    android:textColor="@color/text_primary" />
 
                 <Button
                     android:id="@+id/btnRemovePin"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/GlossyOutlineButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:text="Видалити PIN-код"
-                    android:textColor="#F44336"
-                    app:strokeColor="#F44336"
-                    android:visibility="gone"
-                    app:cornerRadius="50dp" />
+                    android:textColor="@color/dark_red"
+                    android:visibility="gone" />
 
                 <Button
                     android:id="@+id/btnLogout"
+                    style="@style/GlossyOutlineButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:backgroundTint="#757575"
+                    android:layout_marginBottom="8dp"
                     android:text="Вийти з акаунта"
-                    app:cornerRadius="50dp" />
+                    android:textColor="@color/text_secondary" />
 
                 <Button
                     android:id="@+id/btnDeleteAccount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="#F44336"
+                    android:background="@drawable/bg_glossy_red"
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"
                     android:text="Видалити акаунт"
-                    android:textColor="#FFFFFF"
-                    app:cornerRadius="50dp" />
+                    android:textColor="@color/white_soft"
+                    app:backgroundTint="@null" />
             </LinearLayout>
 
         </FrameLayout>

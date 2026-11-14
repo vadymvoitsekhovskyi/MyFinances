@@ -57,17 +57,19 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:buttonTint="@color/dark_red"
                     android:checked="true"
                     android:text="Витрата"
-                    android:textColor="#F44336" />
+                    android:textColor="@color/dark_red" />
 
                 <RadioButton
                     android:id="@+id/rbIncome"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:buttonTint="@color/dark_green"
                     android:text="Дохід"
-                    android:textColor="#4CAF50" />
+                    android:textColor="@color/dark_green" />
             </RadioGroup>
 
             <EditText
@@ -125,8 +127,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:text="Зберегти"
-                app:cornerRadius="50dp" />
+                android:text="Зберегти" />
 
         </LinearLayout>
     </ScrollView>

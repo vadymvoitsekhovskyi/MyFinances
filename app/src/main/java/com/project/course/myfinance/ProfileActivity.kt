@@ -381,7 +381,7 @@ class ProfileActivity : AppCompatActivity() {
                 addRule(android.widget.RelativeLayout.CENTER_IN_PARENT)
             }
             radius = size / 2f
-            setCardBackgroundColor(android.graphics.Color.parseColor("#2E7D32"))
+            setCardBackgroundColor(android.graphics.Color.parseColor("#1B5E20"))
             cardElevation = 0f
         }
 

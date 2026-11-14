@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="@color/background_main">
 
     <TextView
         android:id="@+id/tvPinTitle"
@@ -48,7 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:textAlignment="center"
-        android:textColor="#F44336"
+        android:textColor="@color/dark_red"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -84,11 +85,13 @@
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:layout_margin="8dp"
-            android:src="@drawable/ic_fingerprint"
-            app:tint="#757575"
+            android:background="@drawable/bg_glossy_pin"
+            android:elevation="0dp"
             android:padding="22dp"
             android:scaleType="fitCenter"
-            android:elevation="0dp" />
+            android:src="@drawable/ic_fingerprint"
+            android:stateListAnimator="@null"
+            app:tint="@color/text_secondary" />
 
         <Button
             android:id="@+id/btn0"
@@ -100,11 +103,13 @@
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:layout_margin="8dp"
-            android:src="@android:drawable/ic_input_delete"
-            app:tint="#757575"
+            android:background="@drawable/bg_glossy_pin"
+            android:elevation="0dp"
             android:padding="22dp"
             android:scaleType="fitCenter"
-            android:elevation="0dp" />
+            android:src="@android:drawable/ic_input_delete"
+            android:stateListAnimator="@null"
+            app:tint="@color/text_secondary" />
     </GridLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

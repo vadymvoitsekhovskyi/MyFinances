@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Витрата"
-        android:textColor="#F44336"
+        android:textColor="@color/dark_red"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -131,18 +131,14 @@
 
         <Button
             android:id="@+id/btnEdit"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/GlossyOutlineButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:text="Редагувати"
-
             android:textAllCaps="false"
-
-            android:textColor="@color/primary_green"
-            app:strokeColor="@color/primary_green"
-            app:cornerRadius="50dp" />
+            android:textColor="@color/dark_green" />
 
         <Button
             android:id="@+id/btnDelete"
@@ -150,10 +146,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:backgroundTint="#F44336"
+            android:background="@drawable/bg_glossy_red"
+            android:elevation="0dp"
+            android:stateListAnimator="@null"
             android:text="Видалити"
-            android:textColor="#FFFFFF"
-            app:cornerRadius="50dp" />
+            android:textColor="@color/white_soft"
+            app:backgroundTint="@null" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
