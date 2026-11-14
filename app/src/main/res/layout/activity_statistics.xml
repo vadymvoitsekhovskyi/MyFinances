@@ -106,7 +106,6 @@
             android:paddingHorizontal="16dp"
             android:paddingTop="4dp">
 
-            <!-- Картка зведеної звітності за період -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardSummaryReport"
                 android:layout_width="match_parent"
@@ -249,7 +248,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Розумна фінансова підказка -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardTrend"
                 android:layout_width="match_parent"
@@ -303,7 +301,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Витрати за категоріями + список -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardExpensePie"
                 android:layout_width="match_parent"
@@ -344,7 +341,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Доходи за категоріями + список -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardIncomePie"
                 android:layout_width="match_parent"
@@ -385,7 +381,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Динаміка по днях з прокруткою та вибором бару -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -426,7 +421,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Річний звіт із перемикачем років -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -38,7 +38,7 @@ class PinAuthActivity : AppCompatActivity() {
 
         checkLockoutState(tvError)
         setupKeypad(tvError, prefs)
-        setupBiometricAuth() // Одразу пропонуємо відбиток при вході
+        setupBiometricAuth()
     }
 
     private fun setupKeypad(tvError: TextView, prefs: android.content.SharedPreferences) {

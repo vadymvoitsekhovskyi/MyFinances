@@ -121,7 +121,7 @@ class TransactionAdapter(
 
         holder.tvCategory.text = transaction.category
         holder.tvTime.text = timeFormatter.format(currentDateObj)
-        holder.tvComment.visibility = View.GONE //
+        holder.tvComment.visibility = View.GONE
 
         if (transaction.type == "income") {
             holder.tvAmount.text = String.format(Locale.US, "+ %.2f ₴", transaction.amount)

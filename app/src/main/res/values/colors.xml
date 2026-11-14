@@ -3,24 +3,14 @@
     <color name="black">#FF121417</color>
     <color name="white">#FFFFFFFF</color>
     <color name="white_soft">#F4F6F8</color>
-
-    <!-- Приглушений фон, на якому чітко видно білий glossy-блік по краях -->
     <color name="background_main">#E6EAEE</color>
-
-    <!-- Темно-зелений (баланс, доходи, головні акценти) -->
     <color name="dark_green">#1B5E20</color>
     <color name="dark_green_deep">#124116</color>
     <color name="dark_green_translucent">#E61B5E20</color>
     <color name="selection_green">#C8E6C9</color>
-
-    <!-- Темно-червоний (витрати, видалення) -->
     <color name="dark_red">#B71C1C</color>
     <color name="dark_red_translucent">#E6B71C1C</color>
-
-    <!-- Темно-оранжевий / бурштиновий (баланс над транзакціями, імпорт) -->
     <color name="dark_orange">#D84315</color>
-
-    <!-- Текст та контури -->
     <color name="text_primary">#1C1F23</color>
     <color name="text_secondary">#545B64</color>
     <color name="text_muted">#7A828C</color>

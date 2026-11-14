@@ -9,7 +9,6 @@
             <corners android:radius="20dp" />
         </shape>
     </item>
-    <!-- Верхній скляний відблиск -->
     <item>
         <shape android:shape="rectangle">
             <gradient
@@ -20,7 +19,6 @@
             <corners android:radius="20dp" />
         </shape>
     </item>
-    <!-- Світлий глянцевий обідок по краю -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="@android:color/transparent" />

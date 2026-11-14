@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- 1. Напівпрозора біла основа -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#CCFFFFFF" />
@@ -8,7 +7,6 @@
         </shape>
     </item>
 
-    <!-- 2. Верхній глянцевий блік (ефект опуклості) -->
     <item>
         <shape android:shape="rectangle">
             <gradient
@@ -20,7 +18,6 @@
         </shape>
     </item>
 
-    <!-- 3. Глянцевий край (світлий зверху, м'який контур знизу) -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="@android:color/transparent" />
