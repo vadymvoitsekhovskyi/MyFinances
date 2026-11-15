@@ -153,7 +153,7 @@ class ProfileActivity : AppCompatActivity() {
             }
 
             val til1 = com.google.android.material.textfield.TextInputLayout(this).apply {
-                hint = "Новий PIN (4-16 цифр)"
+                hint = "Новий PIN (4 цифри)"
                 endIconMode =
                     com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
                 layoutParams = LinearLayout.LayoutParams(
@@ -164,7 +164,7 @@ class ProfileActivity : AppCompatActivity() {
                 inputType = android.text.InputType.TYPE_CLASS_NUMBER
                 transformationMethod =
                     android.text.method.PasswordTransformationMethod.getInstance()
-                filters = arrayOf(android.text.InputFilter.LengthFilter(16))
+                filters = arrayOf(android.text.InputFilter.LengthFilter(4))
                 importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
             }
             til1.addView(input1)
@@ -181,7 +181,7 @@ class ProfileActivity : AppCompatActivity() {
                 inputType = android.text.InputType.TYPE_CLASS_NUMBER
                 transformationMethod =
                     android.text.method.PasswordTransformationMethod.getInstance()
-                filters = arrayOf(android.text.InputFilter.LengthFilter(16))
+                filters = arrayOf(android.text.InputFilter.LengthFilter(4))
                 importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
             }
             til2.addView(input2)
@@ -208,7 +208,7 @@ class ProfileActivity : AppCompatActivity() {
                     } else if (pin1.length < 4) {
                         Toast.makeText(
                             this,
-                            "PIN-код має містити мінімум 4 цифри",
+                            "PIN-код має містити 4 цифри",
                             Toast.LENGTH_SHORT
                         ).show()
                     } else if (pin1 != pin2) {
@@ -245,7 +245,7 @@ class ProfileActivity : AppCompatActivity() {
 
                 transformationMethod =
                     android.text.method.PasswordTransformationMethod.getInstance()
-                filters = arrayOf(android.text.InputFilter.LengthFilter(16))
+                filters = arrayOf(android.text.InputFilter.LengthFilter(4))
                 importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
             }
             til.addView(input)

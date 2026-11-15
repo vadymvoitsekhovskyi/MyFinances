@@ -49,6 +49,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var mainContent: androidx.constraintlayout.widget.ConstraintLayout
     private lateinit var layoutNoInternet: LinearLayout
     private var connectivityManager: ConnectivityManager? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
@@ -106,7 +107,9 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
+        mainContent = findViewById(R.id.mainContent)
         layoutNoInternet = findViewById(R.id.layoutNoInternet)
+
         setupNetworkMonitoring()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -260,7 +263,7 @@ class MainActivity : AppCompatActivity() {
         networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 runOnUiThread {
-                    layoutNoInternet.visibility = View.GONE
+                    setNoInternetVisible(false)
                     loadTotalBalance()
                     loadTransactions()
                 }
@@ -268,7 +271,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onLost(network: Network) {
                 runOnUiThread {
-                    layoutNoInternet.visibility = View.VISIBLE
+                    setNoInternetVisible(true)
                 }
             }
         }
@@ -285,7 +288,22 @@ class MainActivity : AppCompatActivity() {
             capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
 
         if (!hasInternet) {
-            layoutNoInternet.visibility = View.VISIBLE
+            setNoInternetVisible(true)
+        }
+    }
+
+    private fun setNoInternetVisible(visible: Boolean) {
+        layoutNoInternet.visibility = if (visible) View.VISIBLE else View.GONE
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            mainContent.setRenderEffect(
+                if (visible) {
+                    android.graphics.RenderEffect.createBlurEffect(
+                        25f, 25f, android.graphics.Shader.TileMode.CLAMP
+                    )
+                } else {
+                    null
+                }
+            )
         }
     }
 

@@ -10,26 +10,29 @@
         android:id="@+id/tvPinTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
         android:text="Введіть PIN-код"
         android:textColor="@color/text_primary"
         android:textSize="24sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/tvPinDisplay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
         android:id="@+id/tvPinDisplay"
         android:layout_width="220dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_marginTop="16dp"
         android:gravity="center"
+        android:includeFontPadding="false"
         android:letterSpacing="0.4"
         android:text=""
         android:textColor="@color/text_primary"
         android:textSize="44sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/vPinUnderline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvPinTitle" />
@@ -40,6 +43,7 @@
         android:layout_height="2dp"
         android:layout_marginTop="4dp"
         android:background="#BDBDBD"
+        app:layout_constraintBottom_toTopOf="@id/tvError"
         app:layout_constraintEnd_toEndOf="@id/tvPinDisplay"
         app:layout_constraintStart_toStartOf="@id/tvPinDisplay"
         app:layout_constraintTop_toBottomOf="@id/tvPinDisplay" />
@@ -48,6 +52,8 @@
         android:id="@+id/tvError"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="20dp"
         android:gravity="center"
         android:textAlignment="center"
         android:textColor="@color/dark_red"
@@ -68,8 +74,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/vPinUnderline"
-        app:layout_constraintVertical_bias="0.45">
+        app:layout_constraintTop_toBottomOf="@id/tvError">
 
         <Button android:id="@+id/btn1" style="@style/PinButton" android:text="1" />
         <Button android:id="@+id/btn2" style="@style/PinButton" android:text="2" />

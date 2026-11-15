@@ -11,7 +11,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="60dp"
         android:gravity="center_vertical"
         android:minHeight="?attr/actionBarSize"
         android:orientation="horizontal"
@@ -25,13 +25,16 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Назад"
             android:padding="2dp"
-            android:src="@drawable/ic_back_arrow" />
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_back_arrow"
+            app:tint="@color/text_primary" />
 
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:includeFontPadding="false"
             android:text="Нова транзакція"
             android:textColor="@color/text_primary"
             android:textSize="24sp"
