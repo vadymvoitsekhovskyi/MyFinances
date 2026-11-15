@@ -66,7 +66,8 @@ class AddTransactionActivity : AppCompatActivity() {
             }
         }
 
-        val chipGroupQuickCategories = findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupQuickCategories)
+        val chipGroupQuickCategories =
+            findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupQuickCategories)
         val quickCategories = listOf("Кава", "Продукти", "Зарплата", "Дім", "Аптека", "Інше")
 
         quickCategories.forEach { catName ->
@@ -74,7 +75,12 @@ class AddTransactionActivity : AppCompatActivity() {
                 text = catName
                 isCheckable = false
                 setChipBackgroundColorResource(R.color.white_soft)
-                setTextColor(androidx.core.content.ContextCompat.getColor(this@AddTransactionActivity, R.color.text_primary))
+                setTextColor(
+                    androidx.core.content.ContextCompat.getColor(
+                        this@AddTransactionActivity,
+                        R.color.text_primary
+                    )
+                )
                 setOnClickListener {
                     etCategory.setText(catName, false)
                     if (catName == "Інше") {

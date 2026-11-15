@@ -47,8 +47,15 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import androidx.lifecycle.lifecycleScope
+import com.project.course.myfinance.currency.CurrencyRepository
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var tvUsdRate: TextView
+    private lateinit var tvEurRate: TextView
+    private var currentUsdRate: Double = 0.0
+    private var currentEurRate: Double = 0.0
     private lateinit var mainContent: androidx.constraintlayout.widget.ConstraintLayout
     private lateinit var layoutNoInternet: LinearLayout
     private var connectivityManager: ConnectivityManager? = null
@@ -165,8 +172,19 @@ class MainActivity : AppCompatActivity() {
 
         tvTotalBalance.text = "••••• ₴"
 
-        layoutBalanceText.setOnClickListener {
+        tvTotalBalance.setOnClickListener {
             toggleBalanceVisibility()
+        }
+
+        tvUsdRate = findViewById(R.id.tvUsdRate)
+        tvEurRate = findViewById(R.id.tvEurRate)
+
+        findViewById<ImageButton>(R.id.btnCurrency).setOnClickListener {
+            val intent = Intent(this, CurrencyActivity::class.java).apply {
+                putExtra("EXTRA_USD_RATE", currentUsdRate)
+                putExtra("EXTRA_EUR_RATE", currentEurRate)
+            }
+            startActivity(intent)
         }
 
         btnFilterType.setOnClickListener { showTypeFilterDialog() }
@@ -252,9 +270,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         loadTotalBalance()
+        loadCurrencyRates()
         loadTransactions()
         updateProfileIcon()
         startAnimatedIconsLoop()
+    }
+
+    private fun loadCurrencyRates() {
+        lifecycleScope.launch {
+            val rates = CurrencyRepository.fetchCurrentRates()
+            val usd = rates.find { it.code == "USD" }?.rate
+            val eur = rates.find { it.code == "EUR" }?.rate
+
+            if (usd != null && eur != null) {
+                currentUsdRate = usd
+                currentEurRate = eur
+                tvUsdRate.text = String.format(Locale.US, "\uD83C\uDDFA\uD83C\uDDF8 %.2f ₴", usd)
+                tvEurRate.text = String.format(Locale.US, "\uD83C\uDDEA\uD83C\uDDFA %.2f ₴", eur)
+            }
+        }
     }
 
     private fun setupNetworkMonitoring() {
@@ -264,6 +298,7 @@ class MainActivity : AppCompatActivity() {
             override fun onAvailable(network: Network) {
                 runOnUiThread {
                     setNoInternetVisible(false)
+                    loadTotalBalance()
                     loadTotalBalance()
                     loadTransactions()
                 }

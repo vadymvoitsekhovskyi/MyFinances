@@ -17,9 +17,9 @@ class AuthRepository {
         val user = result.user
 
         if (user != null && name.isNotBlank()) {
-            val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
-                .setDisplayName(name)
-                .build()
+            val profileUpdates =
+                com.google.firebase.auth.UserProfileChangeRequest.Builder().setDisplayName(name)
+                    .build()
             user.updateProfile(profileUpdates).await()
         }
 

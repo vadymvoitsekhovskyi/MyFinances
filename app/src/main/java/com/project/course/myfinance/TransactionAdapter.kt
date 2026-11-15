@@ -26,10 +26,18 @@ class TransactionAdapter(
     private var dailyExpenses: Map<String, Double> = emptyMap()
     private var dailyIncomes: Map<String, Double> = emptyMap()
     private val timeZone = TimeZone.getTimeZone("Europe/Kyiv")
-    private val yearFormatter = SimpleDateFormat("yyyy", Locale("uk", "UA")).apply { this.timeZone = this@TransactionAdapter.timeZone }
-    private val dayMonthFormatter = SimpleDateFormat("dd MMMM", Locale("uk", "UA")).apply { this.timeZone = this@TransactionAdapter.timeZone }
-    private val exactDateFormatter = SimpleDateFormat("ddMMyyyy", Locale.getDefault()).apply { this.timeZone = this@TransactionAdapter.timeZone }
-    private val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault()).apply { this.timeZone = this@TransactionAdapter.timeZone }
+    private val yearFormatter = SimpleDateFormat("yyyy", Locale("uk", "UA")).apply {
+        this.timeZone = this@TransactionAdapter.timeZone
+    }
+    private val dayMonthFormatter = SimpleDateFormat("dd MMMM", Locale("uk", "UA")).apply {
+        this.timeZone = this@TransactionAdapter.timeZone
+    }
+    private val exactDateFormatter = SimpleDateFormat("ddMMyyyy", Locale.getDefault()).apply {
+        this.timeZone = this@TransactionAdapter.timeZone
+    }
+    private val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+        this.timeZone = this@TransactionAdapter.timeZone
+    }
     private var isHistoricalBalancesVisible = false
 
     class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

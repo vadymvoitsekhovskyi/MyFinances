@@ -52,8 +52,12 @@
 
         <activity
             android:name="com.canhub.cropper.CropImageActivity"
-            android:theme="@style/Theme.AppCompat.DayNight"
-            android:exported="true"/>
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.DayNight" />
+
+        <activity
+            android:name=".CurrencyActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="preloaded_fonts"

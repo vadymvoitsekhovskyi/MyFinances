@@ -261,6 +261,7 @@ class StatisticsActivity : AppCompatActivity() {
                 val start = now - 30L * 24 * 60 * 60 * 1000
                 allTransactions.filter { it.date >= start } to 30
             }
+
             "month" -> {
                 val monthName = SimpleDateFormat("LLLL yyyy", Locale("uk", "UA")).apply {
                     timeZone = kyivTz
@@ -277,6 +278,7 @@ class StatisticsActivity : AppCompatActivity() {
                 }
                 filtered to daysPassed
             }
+
             "year" -> {
                 val currentYear = cal.get(Calendar.YEAR)
                 tvReportPeriodTitle.text = "Звіт за $currentYear рік"
@@ -288,6 +290,7 @@ class StatisticsActivity : AppCompatActivity() {
                 }
                 filtered to daysPassed
             }
+
             else -> {
                 tvReportPeriodTitle.text = "Звіт за весь період"
                 val minDate = allTransactions.minOfOrNull { it.date } ?: now
@@ -365,7 +368,8 @@ class StatisticsActivity : AppCompatActivity() {
         }
 
         if (netResult >= 0) {
-            val savingsRate = if (totalIncome > 0) ((netResult / totalIncome) * 100).toInt() else 100
+            val savingsRate =
+                if (totalIncome > 0) ((netResult / totalIncome) * 100).toInt() else 100
             ivTrendArrow.setImageResource(R.drawable.ic_arrow_up_flat)
             ivTrendArrow.setColorFilter(ContextCompat.getColor(this, R.color.dark_green))
             tvTrendText.text = String.format(
@@ -463,9 +467,11 @@ class StatisticsActivity : AppCompatActivity() {
             }
 
             val dot = View(this).apply {
-                layoutParams = LinearLayout.LayoutParams((12 * density).toInt(), (12 * density).toInt()).apply {
-                    marginEnd = (10 * density).toInt()
-                }
+                layoutParams =
+                    LinearLayout.LayoutParams((12 * density).toInt(), (12 * density).toInt())
+                        .apply {
+                            marginEnd = (10 * density).toInt()
+                        }
                 background = GradientDrawable().apply {
                     shape = GradientDrawable.OVAL
                     setColor(color)
@@ -473,7 +479,8 @@ class StatisticsActivity : AppCompatActivity() {
             }
 
             val tvCatName = TextView(this).apply {
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                layoutParams =
+                    LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                 text = category
                 textSize = 15f
                 setTextColor(ContextCompat.getColor(this@StatisticsActivity, R.color.text_primary))
@@ -513,7 +520,8 @@ class StatisticsActivity : AppCompatActivity() {
 
             val progressFill = View(this).apply {
                 val fraction = (percent / 100.0).toFloat().coerceIn(0.02f, 1f)
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, fraction)
+                layoutParams =
+                    LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, fraction)
                 background = GradientDrawable().apply {
                     cornerRadius = 8 * density
                     setColor(color)
@@ -522,7 +530,8 @@ class StatisticsActivity : AppCompatActivity() {
 
             val progressEmpty = View(this).apply {
                 val remainder = (1f - (percent / 100.0).toFloat()).coerceAtLeast(0f)
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, remainder)
+                layoutParams =
+                    LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, remainder)
             }
 
             progressBg.addView(progressFill)
@@ -541,8 +550,10 @@ class StatisticsActivity : AppCompatActivity() {
             return
         }
 
-        val dayKeyFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).apply { timeZone = kyivTz }
-        val dayLabelFormat = SimpleDateFormat("dd.MM", Locale.getDefault()).apply { timeZone = kyivTz }
+        val dayKeyFormat =
+            SimpleDateFormat("yyyyMMdd", Locale.getDefault()).apply { timeZone = kyivTz }
+        val dayLabelFormat =
+            SimpleDateFormat("dd.MM", Locale.getDefault()).apply { timeZone = kyivTz }
 
         val groupedByDay = transactions.groupBy { dayKeyFormat.format(Date(it.date)) }.toSortedMap()
 
@@ -554,8 +565,10 @@ class StatisticsActivity : AppCompatActivity() {
         var index = 0f
         for ((_, dayTransactions) in groupedByDay) {
             val label = dayLabelFormat.format(Date(dayTransactions.first().date))
-            val dIncome = dayTransactions.filter { it.type == "income" }.sumOf { it.amount }.toFloat()
-            val dExpense = dayTransactions.filter { it.type == "expense" }.sumOf { it.amount }.toFloat()
+            val dIncome =
+                dayTransactions.filter { it.type == "income" }.sumOf { it.amount }.toFloat()
+            val dExpense =
+                dayTransactions.filter { it.type == "expense" }.sumOf { it.amount }.toFloat()
 
             xAxisLabels.add(label)
             dayStatsList.add(Triple(label, dIncome, dExpense))
@@ -636,8 +649,10 @@ class StatisticsActivity : AppCompatActivity() {
                 cal.timeInMillis = it.date
                 cal.get(Calendar.MONTH) == month
             }
-            val mIncome = monthTransactions.filter { it.type == "income" }.sumOf { it.amount }.toFloat()
-            val mExpense = monthTransactions.filter { it.type == "expense" }.sumOf { it.amount }.toFloat()
+            val mIncome =
+                monthTransactions.filter { it.type == "income" }.sumOf { it.amount }.toFloat()
+            val mExpense =
+                monthTransactions.filter { it.type == "expense" }.sumOf { it.amount }.toFloat()
 
             monthlyTotals.add(mIncome to mExpense)
             incomeEntries.add(BarEntry(month.toFloat(), mIncome))
