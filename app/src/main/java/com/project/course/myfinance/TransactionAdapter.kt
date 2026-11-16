@@ -63,10 +63,7 @@ class TransactionAdapter(
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
         val transaction = transactions[position]
-
         val timeZone = TimeZone.getTimeZone("Europe/Kyiv")
-
-
         val currentDateObj = Date(transaction.date)
         val currentYearStr = yearFormatter.format(currentDateObj)
         val currentDayMonthStr = dayMonthFormatter.format(currentDateObj)
@@ -129,6 +126,25 @@ class TransactionAdapter(
         }
 
         holder.tvCategoryEmoji.text = getCategoryEmoji(transaction.category, transaction.type)
+
+        val isDarkTheme = ThemeManager.isDarkThemeActive(holder.itemView.context)
+        val activePalette = if (isDarkTheme) darkEmojiBgPalette else lightEmojiBgPalette
+
+        val paletteIndex = if (transaction.iconColorIndex in activePalette.indices) {
+            transaction.iconColorIndex
+        } else {
+            abs(transaction.id.hashCode()) % activePalette.size
+        }
+
+        val (fillHex, strokeHex) = activePalette[paletteIndex]
+        val density = holder.itemView.resources.displayMetrics.density
+
+        holder.tvCategoryEmoji.background = android.graphics.drawable.GradientDrawable().apply {
+            shape = android.graphics.drawable.GradientDrawable.OVAL
+            setColor(Color.parseColor(fillHex))
+            setStroke((1 * density).toInt(), Color.parseColor(strokeHex))
+        }
+
         holder.tvCategory.text = transaction.category
         holder.tvTime.text = timeFormatter.format(currentDateObj)
         holder.ivCommentIcon.visibility =
@@ -188,6 +204,28 @@ class TransactionAdapter(
             else -> if (type == "income") "💰" else "🧾"
         }
     }
+
+    private val darkEmojiBgPalette = listOf(
+        "#1B3B2B" to "#2E664A",
+        "#1A2E44" to "#2D5075",
+        "#3D2E17" to "#6B5128",
+        "#2E1F42" to "#513773",
+        "#3F1D24" to "#6E323E",
+        "#17383B" to "#286166",
+        "#232744" to "#3D4475"
+    )
+
+    private val lightEmojiBgPalette = listOf(
+        "#E4F3EB" to "#B7DFCA",
+        "#E3EFFB" to "#B5D2F2",
+        "#FDF1DC" to "#F3D39E",
+        "#EFE7FA" to "#D0B9F0",
+        "#FCE6EA" to "#F2B8C3",
+        "#E0F4F5" to "#AEDEE0",
+        "#E8EAFA" to "#BFC5F0"
+    )
+
+    fun getTransactionAt(position: Int): Transaction? = transactions.getOrNull(position)
 
     override fun getItemCount(): Int = transactions.size
 

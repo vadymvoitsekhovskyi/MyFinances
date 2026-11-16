@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat
 class PinAuthActivity : AppCompatActivity() {
     private var attempts = 0
     private var timer: CountDownTimer? = null
-
     private var currentPin = ""
     private var isLocked = false
     private lateinit var tvPinDisplay: TextView

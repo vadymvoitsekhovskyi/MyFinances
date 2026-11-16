@@ -244,6 +244,7 @@ class MainActivity : AppCompatActivity() {
 
         rvTransactions.layoutManager = LinearLayoutManager(this)
         rvTransactions.adapter = transactionAdapter
+        setupSwipeActions()
 
         rvTransactions.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -857,27 +858,39 @@ class MainActivity : AppCompatActivity() {
 
         if (transaction.type == "income") {
             bsType.text = "Дохід"
-            bsType.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_green))
+            bsType.setTextColor(
+                androidx.core.content.ContextCompat.getColor(
+                    this,
+                    R.color.dark_green
+                )
+            )
             bsAmount.text = String.format(Locale.US, "+ %.2f ₴", transaction.amount)
-            bsAmount.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_green))
+            bsAmount.setTextColor(
+                androidx.core.content.ContextCompat.getColor(
+                    this,
+                    R.color.dark_green
+                )
+            )
         } else {
             bsType.text = "Витрата"
-            bsType.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_red))
+            bsType.setTextColor(
+                androidx.core.content.ContextCompat.getColor(
+                    this,
+                    R.color.dark_red
+                )
+            )
             bsAmount.text = String.format(Locale.US, "- %.2f ₴", transaction.amount)
-            bsAmount.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.text_primary))
+            bsAmount.setTextColor(
+                androidx.core.content.ContextCompat.getColor(
+                    this,
+                    R.color.text_primary
+                )
+            )
         }
 
         btnEdit.setOnClickListener {
             bottomSheetDialog.dismiss()
-            val intent = Intent(this, AddTransactionActivity::class.java).apply {
-                putExtra("EXTRA_ID", transaction.id)
-                putExtra("EXTRA_TYPE", transaction.type)
-                putExtra("EXTRA_AMOUNT", transaction.amount)
-                putExtra("EXTRA_CATEGORY", transaction.category)
-                putExtra("EXTRA_COMMENT", transaction.comment)
-                putExtra("EXTRA_DATE", transaction.date)
-            }
-            startActivity(intent)
+            openEditTransaction(transaction)
         }
 
         btnDelete.setOnClickListener {
@@ -886,6 +899,158 @@ class MainActivity : AppCompatActivity() {
         }
 
         bottomSheetDialog.show()
+    }
+
+    private fun openEditTransaction(transaction: Transaction) {
+        val intent = Intent(this, AddTransactionActivity::class.java).apply {
+            putExtra("EXTRA_ID", transaction.id)
+            putExtra("EXTRA_TYPE", transaction.type)
+            putExtra("EXTRA_AMOUNT", transaction.amount)
+            putExtra("EXTRA_CATEGORY", transaction.category)
+            putExtra("EXTRA_COMMENT", transaction.comment)
+            putExtra("EXTRA_DATE", transaction.date)
+            putExtra("EXTRA_COLOR_INDEX", transaction.iconColorIndex)
+        }
+        startActivity(intent)
+    }
+
+    private fun setupSwipeActions() {
+        val swipeCallback = object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(
+            0,
+            androidx.recyclerview.widget.ItemTouchHelper.LEFT or androidx.recyclerview.widget.ItemTouchHelper.RIGHT
+        ) {
+            private val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+            private val clipPath = android.graphics.Path()
+            private val cardRect = android.graphics.RectF()
+
+            override fun getSwipeDirs(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                if (transactionAdapter.selectedIds.isNotEmpty()) return 0
+                return super.getSwipeDirs(recyclerView, viewHolder)
+            }
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.bindingAdapterPosition
+                if (position == RecyclerView.NO_POSITION) return
+                val transaction = transactionAdapter.getTransactionAt(position) ?: return
+
+                transactionAdapter.notifyItemChanged(position)
+
+                if (direction == androidx.recyclerview.widget.ItemTouchHelper.LEFT) {
+                    showDeleteConfirmationDialog(listOf(transaction.id))
+                } else if (direction == androidx.recyclerview.widget.ItemTouchHelper.RIGHT) {
+                    openEditTransaction(transaction)
+                }
+            }
+
+            override fun onChildDraw(
+                c: android.graphics.Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                val holder = viewHolder as? TransactionAdapter.TransactionViewHolder ?: return
+                val cardView = holder.cardView
+                val itemView = holder.itemView
+
+                if (dX != 0f) {
+                    val density = resources.displayMetrics.density
+                    val cornerRadius = 14f * density
+                    val iconMargin = (18 * density).toInt()
+
+                    cardRect.set(
+                        (itemView.left + cardView.left).toFloat(),
+                        (itemView.top + cardView.top).toFloat(),
+                        (itemView.left + cardView.right).toFloat(),
+                        (itemView.top + cardView.bottom).toFloat()
+                    )
+
+                    c.save()
+                    clipPath.reset()
+                    clipPath.addRoundRect(
+                        cardRect,
+                        cornerRadius,
+                        cornerRadius,
+                        android.graphics.Path.Direction.CW
+                    )
+                    c.clipPath(clipPath)
+
+                    if (dX > 0) {
+                        paint.color = androidx.core.content.ContextCompat.getColor(
+                            this@MainActivity,
+                            R.color.dark_green
+                        )
+                        c.drawRect(cardRect, paint)
+
+                        val icon = androidx.core.content.ContextCompat.getDrawable(
+                            this@MainActivity,
+                            android.R.drawable.ic_menu_edit
+                        )
+                        icon?.let {
+                            it.setTint(Color.WHITE)
+                            val size = it.intrinsicHeight
+                            val top = (cardRect.centerY() - size / 2f).toInt()
+                            val left = (cardRect.left + iconMargin).toInt()
+                            it.setBounds(left, top, left + size, top + size)
+                            it.draw(c)
+                        }
+                    } else {
+                        paint.color = Color.parseColor("#C62828")
+                        c.drawRect(cardRect, paint)
+
+                        val icon = androidx.core.content.ContextCompat.getDrawable(
+                            this@MainActivity,
+                            android.R.drawable.ic_menu_delete
+                        )
+                        icon?.let {
+                            it.setTint(Color.WHITE)
+                            val size = it.intrinsicHeight
+                            val top = (cardRect.centerY() - size / 2f).toInt()
+                            val right = (cardRect.right - iconMargin).toInt()
+                            it.setBounds(right - size, top, right, top + size)
+                            it.draw(c)
+                        }
+                    }
+                    c.restore()
+                }
+
+                getDefaultUIUtil().onDraw(
+                    c,
+                    recyclerView,
+                    cardView,
+                    dX,
+                    dY,
+                    actionState,
+                    isCurrentlyActive
+                )
+            }
+
+            override fun clearView(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ) {
+                val holder = viewHolder as? TransactionAdapter.TransactionViewHolder
+                if (holder != null) {
+                    getDefaultUIUtil().clearView(holder.cardView)
+                } else {
+                    super.clearView(recyclerView, viewHolder)
+                }
+            }
+        }
+
+        androidx.recyclerview.widget.ItemTouchHelper(swipeCallback)
+            .attachToRecyclerView(rvTransactions)
     }
 
     private fun showDeleteConfirmationDialog(transactionIds: List<String>) {

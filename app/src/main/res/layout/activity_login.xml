@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
         android:hint="Email"
+        app:boxStrokeColor="@color/selector_input_stroke"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle">
@@ -44,6 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:hint="Пароль"
+        app:boxStrokeColor="@color/selector_input_stroke"
         app:endIconMode="password_toggle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

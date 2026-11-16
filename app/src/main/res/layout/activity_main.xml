@@ -244,7 +244,7 @@
             app:boxCornerRadiusBottomStart="28dp"
             app:boxCornerRadiusTopEnd="28dp"
             app:boxCornerRadiusTopStart="28dp"
-            app:boxStrokeColor="@color/dark_green"
+            app:boxStrokeColor="@color/selector_input_stroke"
             app:hintEnabled="true"
             app:hintTextColor="@color/dark_green"
             app:layout_constraintEnd_toEndOf="parent"

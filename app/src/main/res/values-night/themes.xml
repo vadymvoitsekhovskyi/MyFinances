@@ -1,5 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-
     <style name="Base.Theme.MyFinance" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/dark_green</item>
         <item name="colorSecondary">@color/dark_green</item>
@@ -11,6 +10,5 @@
         <item name="fontFamily">@font/manrope_medium</item>
         <item name="materialButtonStyle">@style/GlossyButton</item>
     </style>
-
     <style name="Theme.MyFinance" parent="Base.Theme.MyFinance" />
 </resources>

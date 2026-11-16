@@ -41,40 +41,32 @@ import kotlin.math.abs
 import kotlin.math.max
 
 class StatisticsActivity : AppCompatActivity() {
-
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val kyivTz = TimeZone.getTimeZone("Europe/Kyiv")
-
     private var allTransactions: List<Transaction> = emptyList()
     private var selectedPeriod = "30d"
     private var selectedYear = Calendar.getInstance(kyivTz).get(Calendar.YEAR)
-
     private lateinit var btnPeriod30Days: Button
     private lateinit var btnPeriodMonth: Button
     private lateinit var btnPeriodYear: Button
     private lateinit var btnPeriodAll: Button
-
     private lateinit var tvReportPeriodTitle: TextView
     private lateinit var tvReportIncome: TextView
     private lateinit var tvReportExpense: TextView
     private lateinit var tvReportNet: TextView
     private lateinit var tvReportAvgDaily: TextView
-
     private lateinit var cardTrend: CardView
     private lateinit var ivTrendArrow: ImageView
     private lateinit var tvTrendText: TextView
-
     private lateinit var cardIncomePie: CardView
     private lateinit var cardExpensePie: CardView
     private lateinit var incomePieChart: PieChart
     private lateinit var expensePieChart: PieChart
     private lateinit var layoutIncomeBreakdown: LinearLayout
     private lateinit var layoutExpenseBreakdown: LinearLayout
-
     private lateinit var barChart: BarChart
     private lateinit var tvSelectedDayInfo: TextView
-
     private lateinit var yearlyBarChart: BarChart
     private lateinit var tvSelectedYear: TextView
     private lateinit var tvSelectedMonthInfo: TextView

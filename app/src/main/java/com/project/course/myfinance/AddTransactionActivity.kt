@@ -27,6 +27,7 @@ class AddTransactionActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private var editingTransactionId: String? = null
     private var originalDate: Long = 0L
+    private var existingColorIndex: Int = -1
 
     private val categories = arrayOf(
         "Кава", "Продукти", "Надходження", "Витрати", "Борг", "Повернення",
@@ -106,6 +107,7 @@ class AddTransactionActivity : AppCompatActivity() {
             val category = intent.getStringExtra("EXTRA_CATEGORY") ?: ""
             val comment = intent.getStringExtra("EXTRA_COMMENT") ?: ""
             originalDate = intent.getLongExtra("EXTRA_DATE", System.currentTimeMillis())
+            existingColorIndex = intent.getIntExtra("EXTRA_COLOR_INDEX", -1)
 
             if (type == "income") rbIncome.isChecked = true else rbExpense.isChecked = true
             etAmount.setText(amount.toString())
@@ -174,13 +176,20 @@ class AddTransactionActivity : AppCompatActivity() {
         val transactionDate =
             if (editingTransactionId != null) originalDate else System.currentTimeMillis()
 
+        val colorIndex = if (editingTransactionId != null && existingColorIndex in 0..6) {
+            existingColorIndex
+        } else {
+            (0 until 7).random()
+        }
+
         val transaction = Transaction(
             id = transactionId,
             type = type,
             category = category,
             amount = amount,
             date = transactionDate,
-            comment = comment
+            comment = comment,
+            iconColorIndex = colorIndex
         )
 
         db.collection("users").document(currentUser.uid)

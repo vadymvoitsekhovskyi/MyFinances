@@ -6,5 +6,6 @@ data class Transaction(
     val category: String = "",
     val amount: Double = 0.0,
     val date: Long = System.currentTimeMillis(),
-    val comment: String = ""
+    val comment: String = "",
+    val iconColorIndex: Int = -1
 )

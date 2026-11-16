@@ -19,7 +19,6 @@
         <activity
             android:name=".PinAuthActivity"
             android:exported="false" />
-
         <activity
             android:name=".SplashActivity"
             android:exported="true">
@@ -28,11 +27,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:exported="false" />
-
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
@@ -45,20 +42,16 @@
         <activity
             android:name=".ProfileActivity"
             android:exported="false" />
-
         <activity
             android:name=".StatisticsActivity"
             android:exported="false" />
-
         <activity
             android:name="com.canhub.cropper.CropImageActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.DayNight" />
-
         <activity
             android:name=".CurrencyActivity"
             android:exported="false" />
-
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
