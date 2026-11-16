@@ -74,7 +74,9 @@ class AddTransactionActivity : AppCompatActivity() {
             val chip = com.google.android.material.chip.Chip(this).apply {
                 text = catName
                 isCheckable = false
-                setChipBackgroundColorResource(R.color.white_soft)
+                setChipBackgroundColorResource(R.color.chip_background)
+                setChipStrokeColorResource(R.color.chip_stroke)
+                chipStrokeWidth = resources.displayMetrics.density * 1f
                 setTextColor(
                     androidx.core.content.ContextCompat.getColor(
                         this@AddTransactionActivity,

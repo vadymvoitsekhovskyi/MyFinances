@@ -1,5 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-
     <style name="Base.Theme.MyFinance" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/dark_green</item>
         <item name="colorSecondary">@color/dark_green</item>
@@ -42,5 +41,9 @@
         <item name="android:layout_margin">10dp</item>
     </style>
 
-    <style name="Theme.MyFinance" parent="Base.Theme.MyFinance" />
+    <style name="Theme.MyFinance" parent="Base.Theme.MyFinance">
+        <item name="android:statusBarColor">@color/background_main</item>
+        <item name="android:navigationBarColor">@color/background_main</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 </resources>

@@ -47,9 +47,10 @@ class TransactionAdapter(
         val tvHistoricalBalance: TextView = itemView.findViewById(R.id.tvHistoricalBalance)
         val tvDateIncome: TextView = itemView.findViewById(R.id.tvDateIncome)
         val tvDateExpense: TextView = itemView.findViewById(R.id.tvDateExpense)
+        val tvCategoryEmoji: TextView = itemView.findViewById(R.id.tvCategoryEmoji)
         val tvCategory: TextView = itemView.findViewById(R.id.tvCategory)
-        val tvComment: TextView = itemView.findViewById(R.id.tvComment)
         val tvTime: TextView = itemView.findViewById(R.id.tvTime)
+        val ivCommentIcon: android.widget.ImageView = itemView.findViewById(R.id.ivCommentIcon)
         val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
         val cardView: View = itemView.findViewById(R.id.cardTransaction)
     }
@@ -127,16 +128,28 @@ class TransactionAdapter(
             holder.tvDateExpense.visibility = View.VISIBLE
         }
 
+        holder.tvCategoryEmoji.text = getCategoryEmoji(transaction.category, transaction.type)
         holder.tvCategory.text = transaction.category
         holder.tvTime.text = timeFormatter.format(currentDateObj)
-        holder.tvComment.visibility = View.GONE
+        holder.ivCommentIcon.visibility =
+            if (transaction.comment.isNotBlank()) View.VISIBLE else View.GONE
 
         if (transaction.type == "income") {
             holder.tvAmount.text = String.format(Locale.US, "+ %.2f ₴", transaction.amount)
-            holder.tvAmount.setTextColor(Color.parseColor("#1B5E20"))
+            holder.tvAmount.setTextColor(
+                androidx.core.content.ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.dark_green
+                )
+            )
         } else {
             holder.tvAmount.text = String.format(Locale.US, "- %.2f ₴", transaction.amount)
-            holder.tvAmount.setTextColor(Color.parseColor("#B71C1C"))
+            holder.tvAmount.setTextColor(
+                androidx.core.content.ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.dark_red
+                )
+            )
         }
 
         if (selectedIds.contains(transaction.id)) {
@@ -152,6 +165,27 @@ class TransactionAdapter(
         holder.cardView.setOnLongClickListener {
             onItemLongClick(transaction)
             true
+        }
+    }
+
+    private fun getCategoryEmoji(category: String, type: String): String {
+        return when (category.trim().lowercase()) {
+            "кава", "кав'ярня" -> "☕"
+            "продукти", "їжа" -> "🛒"
+            "надходження" -> "💵"
+            "витрати" -> "💸"
+            "борг" -> "🤝"
+            "повернення" -> "🔄"
+            "зарплата" -> "💰"
+            "аптека" -> "💊"
+            "техніка" -> "💻"
+            "дім" -> "🏠"
+            "краса/здоров'я", "краса", "здоров'я" -> "🩺"
+            "одяг" -> "👕"
+            "подарунки" -> "🎁"
+            "транспорт", "таксі" -> "🚕"
+            "розваги" -> "🎬"
+            else -> if (type == "income") "💰" else "🧾"
         }
     }
 

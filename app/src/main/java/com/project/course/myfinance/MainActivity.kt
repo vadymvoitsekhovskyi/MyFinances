@@ -141,6 +141,11 @@ class MainActivity : AppCompatActivity() {
         btnResetFilters = findViewById(R.id.btnResetFilters)
         btnResetFilters.setOnClickListener { resetFilters() }
 
+        val btnTheme = findViewById<ImageButton>(R.id.btnTheme)
+        updateThemeButtonIcon(btnTheme)
+        btnTheme.setOnClickListener {
+            showThemeSelectionDialog()
+        }
 
         val cvProfile = findViewById<CardView>(R.id.cvProfile)
         val layoutBalanceText = findViewById<LinearLayout>(R.id.layoutBalanceText)
@@ -274,6 +279,27 @@ class MainActivity : AppCompatActivity() {
         loadTransactions()
         updateProfileIcon()
         startAnimatedIconsLoop()
+    }
+
+    private fun updateThemeButtonIcon(btnTheme: ImageButton) {
+        val isDark = ThemeManager.isDarkThemeActive(this)
+        btnTheme.setImageResource(if (isDark) R.drawable.ic_moon else R.drawable.ic_sun)
+    }
+
+    private fun showThemeSelectionDialog() {
+        val options = arrayOf("Тема пристрою", "Світла", "Темна")
+        val currentMode = ThemeManager.getSavedThemeMode(this)
+
+        AlertDialog.Builder(this)
+            .setTitle("Тема застосунку")
+            .setSingleChoiceItems(options, currentMode) { dialog, which ->
+                dialog.dismiss()
+                if (which != currentMode) {
+                    ThemeManager.saveAndApplyTheme(this, which)
+                }
+            }
+            .setNegativeButton("Скасувати", null)
+            .show()
     }
 
     private fun loadCurrencyRates() {
@@ -831,14 +857,14 @@ class MainActivity : AppCompatActivity() {
 
         if (transaction.type == "income") {
             bsType.text = "Дохід"
-            bsType.setTextColor(Color.parseColor("#4CAF50"))
+            bsType.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_green))
             bsAmount.text = String.format(Locale.US, "+ %.2f ₴", transaction.amount)
-            bsAmount.setTextColor(Color.parseColor("#4CAF50"))
+            bsAmount.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_green))
         } else {
             bsType.text = "Витрата"
-            bsType.setTextColor(Color.parseColor("#F44336"))
+            bsType.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_red))
             bsAmount.text = String.format(Locale.US, "- %.2f ₴", transaction.amount)
-            bsAmount.setTextColor(Color.parseColor("#000000"))
+            bsAmount.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.text_primary))
         }
 
         btnEdit.setOnClickListener {

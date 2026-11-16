@@ -33,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="16dp"
-        android:background="#E0E0E0"
+        android:background="@color/divider_color"
         app:layout_constraintTop_toBottomOf="@id/bsAmount" />
 
     <TextView
@@ -65,7 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="16dp"
-        android:background="#E0E0E0"
+        android:background="@color/divider_color"
         app:layout_constraintTop_toBottomOf="@id/bsCategoryLabel" />
 
     <TextView
@@ -97,7 +97,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="16dp"
-        android:background="#E0E0E0"
+        android:background="@color/divider_color"
         app:layout_constraintTop_toBottomOf="@id/bsDateLabel" />
 
     <TextView
