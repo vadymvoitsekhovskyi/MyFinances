@@ -30,14 +30,26 @@
             app:tint="@color/text_primary" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_weight="1"
             android:includeFontPadding="false"
             android:text="Профіль"
             android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/btnAbout"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Про програму"
+            android:padding="4dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_info"
+            app:tint="@color/dark_green" />
     </LinearLayout>
 
     <androidx.cardview.widget.CardView

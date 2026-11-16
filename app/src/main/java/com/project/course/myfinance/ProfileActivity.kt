@@ -144,6 +144,7 @@ class ProfileActivity : AppCompatActivity() {
                 btnRemovePin.visibility = View.GONE
             }
         }
+
         updatePinButtons()
 
         btnSetPin.setOnClickListener {
@@ -319,6 +320,11 @@ class ProfileActivity : AppCompatActivity() {
         })
 
         btnBack.setOnClickListener { finish() }
+
+        findViewById<ImageView>(R.id.btnAbout).setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
+        }
+
         updateUI()
         loadAvatarFromFirestore()
 
