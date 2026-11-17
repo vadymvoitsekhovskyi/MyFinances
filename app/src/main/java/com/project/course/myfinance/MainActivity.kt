@@ -50,6 +50,8 @@ import android.net.NetworkRequest
 import androidx.lifecycle.lifecycleScope
 import com.project.course.myfinance.currency.CurrencyRepository
 import kotlinx.coroutines.launch
+import android.os.CountDownTimer
+import android.widget.ProgressBar
 
 class MainActivity : AppCompatActivity() {
     private lateinit var tvUsdRate: TextView
@@ -95,6 +97,14 @@ class MainActivity : AppCompatActivity() {
     private var dailyExpensesMap = mapOf<String, Double>()
     private var dailyIncomesMap = mapOf<String, Double>()
     private var currentSearchQuery: String = ""
+    private lateinit var layoutUndoDelete: LinearLayout
+    private lateinit var pbUndoTimer: ProgressBar
+    private lateinit var tvUndoSeconds: TextView
+    private lateinit var tvUndoMessage: TextView
+    private lateinit var btnUndoDelete: Button
+    private var deleteCountDownTimer: CountDownTimer? = null
+    private var pendingDeleteIds: Set<String> = emptySet()
+    private var rawAllTransactions: List<Transaction> = emptyList()
 
     private val animatedIcons = listOf(
         R.drawable.icon_anim_1,
@@ -152,6 +162,16 @@ class MainActivity : AppCompatActivity() {
         val btnCloseSelection = findViewById<ImageView>(R.id.btnCloseSelection)
         val btnSelectAll = findViewById<ImageView>(R.id.btnSelectAll)
         val btnDeleteSelected = findViewById<ImageView>(R.id.btnDeleteSelected)
+
+        layoutUndoDelete = findViewById(R.id.layoutUndoDelete)
+        pbUndoTimer = findViewById(R.id.pbUndoTimer)
+        tvUndoSeconds = findViewById(R.id.tvUndoSeconds)
+        tvUndoMessage = findViewById(R.id.tvUndoMessage)
+        btnUndoDelete = findViewById(R.id.btnUndoDelete)
+
+        btnUndoDelete.setOnClickListener {
+            cancelScheduledDeletion()
+        }
 
         btnFilterType = findViewById(R.id.btnFilterType)
         btnFilterCategory = findViewById(R.id.btnFilterCategory)
@@ -490,7 +510,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyFiltersAndSort() {
-        var result = currentTransactions
+        var result = currentTransactions.filter { it.id !in pendingDeleteIds }
 
         if (currentTypeFilter != "all") {
             result = result.filter { it.type == currentTypeFilter }
@@ -644,6 +664,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        deleteCountDownTimer?.cancel()
+        if (pendingDeleteIds.isNotEmpty()) {
+            deleteTransactions(pendingDeleteIds.toList())
+            pendingDeleteIds = emptySet()
+        }
         snapshotListener?.remove()
         balanceListener?.remove()
         networkCallback?.let { connectivityManager?.unregisterNetworkCallback(it) }
@@ -712,53 +737,58 @@ class MainActivity : AppCompatActivity() {
                 .addSnapshotListener { snapshot, error ->
                     if (error != null || snapshot == null) return@addSnapshotListener
 
-                    val allTrans =
+                    rawAllTransactions =
                         snapshot.documents.mapNotNull { it.toObject(Transaction::class.java) }
-                    val sortedTrans = allTrans.sortedBy { it.date }
-                    allAvailableCategories = allTrans.map { it.category }.distinct().sorted()
-
-                    var totalBalance = 0.0
-                    val balancesMap = mutableMapOf<String, Double>()
-                    val expensesMap = mutableMapOf<String, Double>()
-                    val incomesMap = mutableMapOf<String, Double>()
-
-                    val exactDateFormatter =
-                        SimpleDateFormat("ddMMyyyy", Locale.getDefault()).apply {
-                            this.timeZone = TimeZone.getTimeZone("Europe/Kyiv")
-                        }
-
-                    for (t in sortedTrans) {
-                        val dateStr = exactDateFormatter.format(Date(t.date))
-
-                        if (t.type == "income") {
-                            totalBalance += t.amount
-                            incomesMap[dateStr] = (incomesMap[dateStr] ?: 0.0) + t.amount
-                        } else {
-                            totalBalance -= t.amount
-                            expensesMap[dateStr] = (expensesMap[dateStr] ?: 0.0) + t.amount
-                        }
-
-                        balancesMap[dateStr] = totalBalance
-                    }
-
-                    currentTotalBalance = totalBalance
-                    dailyBalancesMap = balancesMap
-                    dailyExpensesMap = expensesMap
-                    dailyIncomesMap = incomesMap
-
-                    if (isBalanceVisible) {
-                        tvTotalBalance.text =
-                            String.format(Locale.US, "%.2f ₴", currentTotalBalance)
-                    }
-
-                    if (::transactionAdapter.isInitialized) {
-                        transactionAdapter.updateDailyStats(
-                            dailyBalancesMap,
-                            dailyExpensesMap,
-                            dailyIncomesMap
-                        )
-                    }
+                    recalculateBalances()
                 }
+    }
+
+    private fun recalculateBalances() {
+        val activeTrans = rawAllTransactions.filter { it.id !in pendingDeleteIds }
+        val sortedTrans = activeTrans.sortedBy { it.date }
+        allAvailableCategories = activeTrans.map { it.category }.distinct().sorted()
+
+        var totalBalance = 0.0
+        val balancesMap = mutableMapOf<String, Double>()
+        val expensesMap = mutableMapOf<String, Double>()
+        val incomesMap = mutableMapOf<String, Double>()
+
+        val exactDateFormatter =
+            SimpleDateFormat("ddMMyyyy", Locale.getDefault()).apply {
+                this.timeZone = TimeZone.getTimeZone("Europe/Kyiv")
+            }
+
+        for (t in sortedTrans) {
+            val dateStr = exactDateFormatter.format(Date(t.date))
+
+            if (t.type == "income") {
+                totalBalance += t.amount
+                incomesMap[dateStr] = (incomesMap[dateStr] ?: 0.0) + t.amount
+            } else {
+                totalBalance -= t.amount
+                expensesMap[dateStr] = (expensesMap[dateStr] ?: 0.0) + t.amount
+            }
+
+            balancesMap[dateStr] = totalBalance
+        }
+
+        currentTotalBalance = totalBalance
+        dailyBalancesMap = balancesMap
+        dailyExpensesMap = expensesMap
+        dailyIncomesMap = incomesMap
+
+        if (isBalanceVisible) {
+            tvTotalBalance.text =
+                String.format(Locale.US, "%.2f ₴", currentTotalBalance)
+        }
+
+        if (::transactionAdapter.isInitialized) {
+            transactionAdapter.updateDailyStats(
+                dailyBalancesMap,
+                dailyExpensesMap,
+                dailyIncomesMap
+            )
+        }
     }
 
     private fun loadTransactions() {
@@ -1062,8 +1092,60 @@ class MainActivity : AppCompatActivity() {
 
         AlertDialog.Builder(this).setTitle("Підтвердження видалення").setMessage(message)
             .setPositiveButton("Видалити") { _, _ ->
-                deleteTransactions(transactionIds)
+                scheduleTransactionsDeletion(transactionIds)
             }.setNegativeButton("Скасувати", null).show()
+    }
+
+    private fun scheduleTransactionsDeletion(transactionIds: List<String>) {
+        deleteCountDownTimer?.cancel()
+        if (pendingDeleteIds.isNotEmpty()) {
+            deleteTransactions(pendingDeleteIds.toList())
+        }
+
+        clearSelection()
+        pendingDeleteIds = transactionIds.toSet()
+        recalculateBalances()
+        applyFiltersAndSort()
+
+        tvUndoMessage.text = if (transactionIds.size == 1) {
+            "Транзакцію видалено"
+        } else {
+            "Видалено транзакцій: ${transactionIds.size}"
+        }
+
+        pbUndoTimer.max = 5000
+        pbUndoTimer.progress = 5000
+        tvUndoSeconds.text = "5"
+        layoutUndoDelete.visibility = View.VISIBLE
+
+        deleteCountDownTimer = object : CountDownTimer(5000L, 50L) {
+            override fun onTick(millisUntilFinished: Long) {
+                pbUndoTimer.progress = millisUntilFinished.toInt()
+                val secondsLeft = kotlin.math.ceil(millisUntilFinished / 1000.0).toInt()
+                tvUndoSeconds.text = secondsLeft.toString()
+            }
+
+            override fun onFinish() {
+                pbUndoTimer.progress = 0
+                tvUndoSeconds.text = "0"
+                layoutUndoDelete.visibility = View.GONE
+
+                val idsToCommit = pendingDeleteIds.toList()
+                pendingDeleteIds = emptySet()
+                if (idsToCommit.isNotEmpty()) {
+                    deleteTransactions(idsToCommit)
+                }
+            }
+        }.start()
+    }
+
+    private fun cancelScheduledDeletion() {
+        deleteCountDownTimer?.cancel()
+        pendingDeleteIds = emptySet()
+        layoutUndoDelete.visibility = View.GONE
+        recalculateBalances()
+        applyFiltersAndSort()
+        Toast.makeText(this, "Видалення скасовано", Toast.LENGTH_SHORT).show()
     }
 
     private fun deleteTransactions(transactionIds: List<String>) {

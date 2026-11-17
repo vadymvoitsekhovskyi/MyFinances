@@ -222,9 +222,8 @@
 
                 <ImageView
                     android:id="@+id/ivBalanceLogo"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:alpha="0.9"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -367,11 +366,82 @@
             app:layout_constraintTop_toBottomOf="@id/tvHistoryLabel" />
 
         <LinearLayout
+            android:id="@+id/layoutUndoDelete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_glossy_panel"
+            android:clickable="true"
+            android:elevation="10dp"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/glossyBottomPanel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <FrameLayout
+                android:layout_width="38dp"
+                android:layout_height="38dp">
+
+                <ProgressBar
+                    android:id="@+id/pbUndoTimer"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="false"
+                    android:max="5000"
+                    android:progress="5000"
+                    android:progressDrawable="@drawable/bg_circular_timer" />
+
+                <TextView
+                    android:id="@+id/tvUndoSeconds"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="5"
+                    android:textColor="@color/dark_green"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvUndoMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:text="Транзакцію видалено"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnUndoDelete"
+                style="@style/GlossyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="0dp"
+                android:text="Відмінити"
+                android:textAllCaps="false"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/glossyBottomPanel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="18dp"
             android:background="@drawable/bg_glossy_panel"
             android:clickable="true"
             android:elevation="8dp"

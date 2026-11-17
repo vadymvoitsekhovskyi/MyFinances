@@ -41,7 +41,6 @@ class TransactionAdapter(
     private var isHistoricalBalancesVisible = false
 
     class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvYearHeader: TextView = itemView.findViewById(R.id.tvYearHeader)
         val layoutDateHeader: LinearLayout = itemView.findViewById(R.id.layoutDateHeader)
         val tvDateHeader: TextView = itemView.findViewById(R.id.tvDateHeader)
         val tvHistoricalBalance: TextView = itemView.findViewById(R.id.tvHistoricalBalance)
@@ -69,7 +68,6 @@ class TransactionAdapter(
         val currentDayMonthStr = dayMonthFormatter.format(currentDateObj)
         val currentExactDateStr = exactDateFormatter.format(currentDateObj)
 
-        holder.tvYearHeader.visibility = View.GONE
         holder.layoutDateHeader.visibility = View.GONE
 
         var showYear = false
@@ -85,11 +83,6 @@ class TransactionAdapter(
 
             if (currentYearStr != prevYearStr) showYear = true
             if (currentExactDateStr != prevExactDateStr) showDate = true
-        }
-
-        if (showYear) {
-            holder.tvYearHeader.visibility = View.VISIBLE
-            holder.tvYearHeader.text = currentYearStr
         }
 
         if (showDate) {
