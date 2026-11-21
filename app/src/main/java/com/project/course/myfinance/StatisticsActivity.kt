@@ -45,8 +45,11 @@ class StatisticsActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private val kyivTz = TimeZone.getTimeZone("Europe/Kyiv")
     private var allTransactions: List<Transaction> = emptyList()
-    private var selectedPeriod = "30d"
+    private var selectedPeriod = "today"
     private var selectedYear = Calendar.getInstance(kyivTz).get(Calendar.YEAR)
+    private lateinit var btnPeriodToday: Button
+    private lateinit var btnPeriodYesterday: Button
+    private lateinit var btnPeriod7Days: Button
     private lateinit var btnPeriod30Days: Button
     private lateinit var btnPeriodMonth: Button
     private lateinit var btnPeriodYear: Button
@@ -102,6 +105,9 @@ class StatisticsActivity : AppCompatActivity() {
 
         findViewById<ImageView>(R.id.btnBack).setOnClickListener { finish() }
 
+        btnPeriodToday = findViewById(R.id.btnPeriodToday)
+        btnPeriodYesterday = findViewById(R.id.btnPeriodYesterday)
+        btnPeriod7Days = findViewById(R.id.btnPeriod7Days)
         btnPeriod30Days = findViewById(R.id.btnPeriod30Days)
         btnPeriodMonth = findViewById(R.id.btnPeriodMonth)
         btnPeriodYear = findViewById(R.id.btnPeriodYear)
@@ -142,6 +148,9 @@ class StatisticsActivity : AppCompatActivity() {
 
     private fun setupPeriodButtons() {
         val periodMap = mapOf(
+            "today" to btnPeriodToday,
+            "yesterday" to btnPeriodYesterday,
+            "7d" to btnPeriod7Days,
             "30d" to btnPeriod30Days,
             "month" to btnPeriodMonth,
             "year" to btnPeriodYear,
@@ -248,6 +257,41 @@ class StatisticsActivity : AppCompatActivity() {
         val cal = Calendar.getInstance(kyivTz)
 
         return when (selectedPeriod) {
+            "today" -> {
+                tvReportPeriodTitle.text = "Звіт за сьогодні"
+                val todayYear = cal.get(Calendar.YEAR)
+                val todayDayOfYear = cal.get(Calendar.DAY_OF_YEAR)
+
+                val filtered = allTransactions.filter {
+                    cal.timeInMillis = it.date
+                    cal.get(Calendar.YEAR) == todayYear && cal.get(Calendar.DAY_OF_YEAR) == todayDayOfYear
+                }
+                filtered to 1
+            }
+
+            "yesterday" -> {
+                cal.add(Calendar.DAY_OF_YEAR, -1)
+                val dateStr = SimpleDateFormat("dd MMMM yyyy", Locale("uk", "UA")).apply {
+                    timeZone = kyivTz
+                }.format(cal.time)
+                tvReportPeriodTitle.text = "Звіт за $dateStr"
+
+                val yesterdayYear = cal.get(Calendar.YEAR)
+                val yesterdayDayOfYear = cal.get(Calendar.DAY_OF_YEAR)
+
+                val filtered = allTransactions.filter {
+                    cal.timeInMillis = it.date
+                    cal.get(Calendar.YEAR) == yesterdayYear && cal.get(Calendar.DAY_OF_YEAR) == yesterdayDayOfYear
+                }
+                filtered to 1
+            }
+
+            "7d" -> {
+                tvReportPeriodTitle.text = "Звіт за останні 7 днів"
+                val start = now - 7L * 24 * 60 * 60 * 1000
+                allTransactions.filter { it.date >= start } to 7
+            }
+
             "30d" -> {
                 tvReportPeriodTitle.text = "Звіт за останні 30 днів"
                 val start = now - 30L * 24 * 60 * 60 * 1000

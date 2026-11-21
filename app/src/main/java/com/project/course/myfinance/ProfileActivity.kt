@@ -1,5 +1,8 @@
 package com.project.course.myfinance
 
+import android.content.ClipData
+import androidx.core.content.FileProvider
+import java.io.File
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
@@ -295,6 +298,7 @@ class ProfileActivity : AppCompatActivity() {
         val btnChangePassword = findViewById<Button>(R.id.btnChangePassword)
         val btnExportData = findViewById<Button>(R.id.btnExportData)
         val btnImportData = findViewById<Button>(R.id.btnImportData)
+        val btnSendData = findViewById<Button>(R.id.btnSendData)
         val btnLogout = findViewById<Button>(R.id.btnLogout)
         val btnDeleteAccount = findViewById<Button>(R.id.btnDeleteAccount)
 
@@ -362,6 +366,7 @@ class ProfileActivity : AppCompatActivity() {
         btnChangePassword.setOnClickListener { showChangePasswordDialog() }
         btnExportData.setOnClickListener { showExportDialog() }
         btnImportData.setOnClickListener { showImportDialog() }
+        btnSendData.setOnClickListener { showShareDialog() }
         btnLogout.setOnClickListener { showLogoutDialog() }
         btnDeleteAccount.setOnClickListener { showDeleteAccountDialog() }
     }
@@ -429,6 +434,18 @@ class ProfileActivity : AppCompatActivity() {
             .setMessage("Оберіть файл формату CSV або JSON. Зверніть увагу, що нові транзакції будуть додані до вашого поточного списку.")
             .setPositiveButton("Вибрати файл") { _, _ ->
                 importLauncher.launch("*/*")
+            }
+            .setNegativeButton("Скасувати", null)
+            .show()
+    }
+
+    private fun showShareDialog() {
+        val formats = arrayOf("CSV", "JSON")
+        AlertDialog.Builder(this)
+            .setTitle("Оберіть формат для надсилання")
+            .setItems(formats) { _, which ->
+                val format = if (which == 0) "csv" else "json"
+                performShare(format)
             }
             .setNegativeButton("Скасувати", null)
             .show()
@@ -568,6 +585,95 @@ class ProfileActivity : AppCompatActivity() {
                     Toast.makeText(
                         this@ProfileActivity,
                         "Помилка імпорту: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    private fun performShare(format: String) {
+        val user = auth.currentUser ?: return
+        setLoading(true)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val snapshot = db.collection("users").document(user.uid)
+                    .collection("transactions").get().await()
+
+                val transactions = snapshot.toObjects(Transaction::class.java)
+                if (transactions.isEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        setLoading(false)
+                        Toast.makeText(
+                            this@ProfileActivity,
+                            "Немає транзакцій для надсилання",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    return@launch
+                }
+
+                val content = if (format == "json") {
+                    val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+                    sdf.timeZone = TimeZone.getTimeZone("Europe/Kyiv")
+
+                    val jsonList = transactions.map { t ->
+                        mapOf(
+                            "id" to t.id,
+                            "type" to t.type,
+                            "category" to t.category,
+                            "amount" to t.amount,
+                            "date" to sdf.format(Date(t.date)),
+                            "comment" to t.comment
+                        )
+                    }
+                    gson.toJson(jsonList)
+                } else {
+                    buildCsvString(transactions)
+                }
+
+                val shareDir = File(cacheDir, "shared_backups").apply {
+                    if (!exists()) mkdirs()
+                    listFiles()?.forEach { it.delete() }
+                }
+
+                val fileName = "myfinance_backup_${System.currentTimeMillis()}.$format"
+                val file = File(shareDir, fileName)
+
+                file.outputStream().use { outputStream ->
+                    if (format == "csv") {
+                        outputStream.write(byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte()))
+                    }
+                    outputStream.write(content.toByteArray(Charsets.UTF_8))
+                }
+
+                val uri = FileProvider.getUriForFile(
+                    this@ProfileActivity,
+                    "${packageName}.fileprovider",
+                    file
+                )
+
+                val mimeType = if (format == "json") "application/json" else "text/csv"
+
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = mimeType
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    putExtra(Intent.EXTRA_SUBJECT, "Транзакції MyFinances ($fileName)")
+                    clipData = ClipData.newRawUri("", uri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+
+                withContext(Dispatchers.Main) {
+                    setLoading(false)
+                    startActivity(Intent.createChooser(shareIntent, "Надіслати файл через"))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    setLoading(false)
+                    Toast.makeText(
+                        this@ProfileActivity,
+                        "Помилка підготовки файлу: ${e.message}",
                         Toast.LENGTH_LONG
                     ).show()
                 }

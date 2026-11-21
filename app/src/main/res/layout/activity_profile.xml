@@ -192,6 +192,15 @@
                 android:visibility="gone">
 
                 <Button
+                    android:id="@+id/btnSendData"
+                    style="@style/GlossyOutlineButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Надіслати"
+                    android:textColor="@color/dark_green" />
+
+                <Button
                     android:id="@+id/btnExportData"
                     style="@style/GlossyOutlineButton"
                     android:layout_width="match_parent"
