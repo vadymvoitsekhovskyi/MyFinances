@@ -7,6 +7,7 @@ import android.os.CountDownTimer
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -140,6 +141,15 @@ class PinAuthActivity : AppCompatActivity() {
                         .edit().putInt("pin_attempts", 0)
                         .putLong("last_active_time", System.currentTimeMillis()).apply()
                     proceed()
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    Toast.makeText(
+                        this@PinAuthActivity,
+                        "Відбиток пальця не розпізнано",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             })
 

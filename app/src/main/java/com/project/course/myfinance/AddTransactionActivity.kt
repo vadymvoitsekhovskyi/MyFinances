@@ -197,7 +197,8 @@ class AddTransactionActivity : AppCompatActivity() {
             .set(transaction)
             .addOnSuccessListener {
                 progressBar.visibility = View.GONE
-                Toast.makeText(this, "Успішно збережено", Toast.LENGTH_SHORT).show()
+                val msg = if (editingTransactionId != null) "Зміни успішно збережено" else "Транзакцію успішно додано"
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                 finish()
             }
             .addOnFailureListener { e ->

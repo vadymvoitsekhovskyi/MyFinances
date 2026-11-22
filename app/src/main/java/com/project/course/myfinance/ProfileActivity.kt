@@ -219,9 +219,11 @@ class ProfileActivity : AppCompatActivity() {
                         Toast.makeText(this, "PIN-коди не співпадають", Toast.LENGTH_SHORT).show()
                         input2.text?.clear()
                     } else {
-                        getSharedPreferences("pin_prefs", android.content.Context.MODE_PRIVATE)
-                            .edit().putString("app_pin", pin1).apply()
-                        Toast.makeText(this, "PIN-код збережено", Toast.LENGTH_SHORT).show()
+                        val prefs = getSharedPreferences("pin_prefs", android.content.Context.MODE_PRIVATE)
+                        val isChanging = prefs.getString("app_pin", null) != null
+                        prefs.edit().putString("app_pin", pin1).apply()
+                        val message = if (isChanging) "PIN-код успішно змінено" else "PIN-код успішно встановлено"
+                        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                         updatePinButtons()
                         dialog.dismiss()
                     }
@@ -659,13 +661,18 @@ class ProfileActivity : AppCompatActivity() {
                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
                     type = mimeType
                     putExtra(Intent.EXTRA_STREAM, uri)
-                    putExtra(Intent.EXTRA_SUBJECT, "Транзакції MyFinances ($fileName)")
-                    clipData = ClipData.newRawUri("", uri)
+                    putExtra(Intent.EXTRA_SUBJECT, "Транзакції MyFinances: $fileName")
+                    clipData = ClipData.newRawUri(fileName, uri)
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
 
                 withContext(Dispatchers.Main) {
                     setLoading(false)
+                    Toast.makeText(
+                        this@ProfileActivity,
+                        "Файл ${format.uppercase()} готовий до надсилання",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     startActivity(Intent.createChooser(shareIntent, "Надіслати файл через"))
                 }
             } catch (e: Exception) {
@@ -858,7 +865,10 @@ class ProfileActivity : AppCompatActivity() {
                 ivBigProfile.visibility = View.GONE
                 tvBigProfileLetter.visibility = View.VISIBLE
             }
-            .addOnFailureListener { setLoading(false) }
+            .addOnFailureListener { e ->
+                setLoading(false)
+                Toast.makeText(this, "Помилка видалення фото: ${e.message}", Toast.LENGTH_LONG).show()
+            }
     }
 
     private fun showChangeNameDialog() {
@@ -897,7 +907,10 @@ class ProfileActivity : AppCompatActivity() {
                                 ).show()
                             }
                         }
+                } else {
+                    Toast.makeText(this, "Ім'я не може бути порожнім", Toast.LENGTH_SHORT).show()
                 }
+
             }
             .setNegativeButton("Скасувати", null)
             .show()
@@ -1148,6 +1161,7 @@ class ProfileActivity : AppCompatActivity() {
             .setPositiveButton("Вийти") { _, _ ->
                 auth.signOut()
                 googleSignInClient.signOut()
+                Toast.makeText(this, "Ви вийшли з акаунта", Toast.LENGTH_SHORT).show()
                 goToLogin()
             }
             .setNegativeButton("Скасувати", null)

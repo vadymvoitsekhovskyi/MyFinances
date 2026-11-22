@@ -100,7 +100,7 @@
                         android:layout_marginTop="12dp"
                         android:gravity="center"
                         android:lineSpacingExtra="2dp"
-                        android:text="Персональний фінансовий застосунок для швидкого обліку доходів і витрат, детальної візуальної аналітики, роботи з валютами НБУ та безпечного зберігання даних у хмарі."
+                        android:text="Персональний фінансовий застосунок для швидкого обліку доходів і витрат, детальної візуальної аналітики, роботи з курсами валют НБУ та безпечного хмарного зберігання даних."
                         android:textColor="#E8F5E9"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -143,7 +143,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
-                        android:text="14 вбудованих категорій (Кава, Продукти, Зарплата, Дім, Аптека, Техніка тощо) з автоматичними емодзі та кольоровими бейджами. Підтримуються швидкі теги в один дотик, створення власних категорій через пункт «Інше» та додавання коментарів."
+                        android:text="14 вбудованих категорій (Кава, Продукти, Зарплата, Дім, Аптека, Техніка тощо) з автоматичними емодзі та адаптивними кольоровими бейджами. Підтримуються швидкі теги в один дотик, створення власних категорій через пункт «Інше» та текстові коментарі."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -156,7 +156,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="• Хронологія та історичний баланс"
+                        android:text="• Хронологія, денні підсумки та історичний баланс"
                         android:textColor="@color/dark_green"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -166,7 +166,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
-                        android:text="Операції автоматично групуються за роками та датами. Для кожного дня відображається сума надходжень (+), витрат (-) і залишок балансу на кінець дня."
+                        android:text="Операції автоматично групуються за датами з поступовим підвантаженням історії для плавної роботи. У заголовку кожного дня відображається сума надходжень (+), витрат (-) і залишок балансу на кінець дня."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -189,7 +189,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
-                        android:text="Загальний баланс на верхній картці та історичні баланси біля дат за замовчуванням приховані від сторонніх очей. Натисніть на маску «••••• ₴», щоб миттєво показати або сховати цифри."
+                        android:text="Загальний баланс на головній картці та історичні баланси біля дат за замовчуванням приховані. Натисніть на маску «••••• ₴», щоб миттєво показати або сховати цифри."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -212,7 +212,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
-                        android:text="Миттєвий пошук за категорією, коментарем або сумою. Фільтри за типом операції, категорією, конкретною датою в календарі, сортування (нові, старі або записи без коментарів) і скидання в один клік. Стрілки на нижній панелі дозволяють швидко перестрибнути на початок або в самий кінець історії."
+                        android:text="Миттєвий пошук за категорією, коментарем або сумою. Фільтри за типом операції, категорією, конкретною датою в календарі, сортування (нові, старі або без коментарів) і скидання в один клік. Стрілки на нижній панелі дозволяють швидко перейти на початок або в кінець історії."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -236,7 +236,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Редагування, свайпи та масові дії"
+                        android:text="Редагування, свайпи та безпечне видалення"
                         android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -246,7 +246,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Детальний перегляд (Bottom Sheet) — коротке натискання на будь-яку транзакцію відкриває нижню шторку з типом, точною сумою, категорією, датою й часом, повним текстом коментаря та кнопками редагування й видалення."
+                        android:text="• Детальний перегляд (Bottom Sheet) — коротке натискання на транзакцію відкриває картку з типом, сумою, категорією, датою й часом, повним коментарем та кнопками редагування й видалення."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -255,7 +255,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Свайп вправо — проведіть картку транзакції праворуч (зелений індикатор), щоб відкрити екран редагування суми, типу, категорії чи коментаря."
+                        android:text="• Свайп вправо — проведіть картку праворуч (зелений індикатор), щоб швидко перейти до редагування суми, типу, категорії чи коментаря."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -264,7 +264,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Свайп вліво — проведіть картку ліворуч (червоний індикатор), щоб видалити операцію після підтвердження."
+                        android:text="• Свайп вліво та скасування (Undo) — проведіть картку ліворуч (червоний індикатор) для видалення. Після підтвердження з'являється плаваюча панель із 5-секундним таймером і кнопкою «Відмінити», щоб повернути видалені записи до остаточного збереження."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -273,7 +273,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Мульти-вибір (довге утримання) — затисніть картку транзакції, щоб увімкнути режим виділення. Можна обрати декілька записів або натиснути «Вибрати все» у верхній панелі для масового видалення."
+                        android:text="• Мульти-вибір (довге утримання) — затисніть картку транзакції, щоб обрати декілька записів або натиснути «Вибрати все» у верхній панелі для масового видалення."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -307,7 +307,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Звіти за 4 періоди — перемикайте аналітику між останніми 30 днями, поточним місяцем, поточним роком або всім часом користування."
+                        android:text="• Звіти за 7 періодів — миттєве перемикання аналітики між сьогоднішнім днем, вчорашнім днем, 7 днями, 30 днями, поточним місяцем, поточним роком або всім часом."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -316,7 +316,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Ключові метрики та інсайти — автоматичний підрахунок доходів, витрат, чистого результату (профіцит або дефіцит), середніх витрат на день, відсотка збереженого доходу та визначення найбільшої категорії витрат."
+                        android:text="• Ключові метрики та інсайти — автоматичний підрахунок доходів, витрат, чистого результату (профіцит або дефіцит), середніх витрат на день, відсотка заощаджень та визначення найбільшої статті витрат."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -325,7 +325,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Інтерактивні діаграми — кільцеві діаграми (PieChart) витрат і доходів із кольоровими шкалами відсотків по кожній категорії (натискання на рядок підсвічує сектор на діаграмі)."
+                        android:text="• Інтерактивні діаграми — кільцеві діаграми (PieChart) витрат і доходів із прогрес-барами відсотків по кожній категорії (натискання на рядок підсвічує сектор на діаграмі)."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -334,7 +334,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Графіки динаміки — порівняльні стовпчикові діаграми по днях та за 12 місяців обраного року з перемиканням років і переглядом точних сум при натисканні на стовпчик."
+                        android:text="• Графіки динаміки — порівняльні стовпчикові діаграми по днях та за 12 місяців обраного року з перемиканням років і деталізацією сум при натисканні на стовпчик."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -377,7 +377,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Крос-конвертер 6 валют — миттєвий перерахунок між UAH, USD, EUR, PLN, GBP та CHF із кнопкою швидкої заміни валют місцями (⇄) і підказкою точного крос-курсу."
+                        android:text="• Крос-конвертер 6 валют — миттєвий перерахунок між UAH, USD, EUR, PLN, GBP та CHF із кнопкою швидкого обміну валют місцями (⇄) і підказкою точного крос-курсу."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -386,7 +386,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Історія курсу за 7 днів — плавний лінійний графік коливань USD та EUR за останній тиждень із таблицею щоденної зміни курсу (+ / - ₴)."
+                        android:text="• Історія курсу за 7 днів — лінійний графік коливань USD та EUR за останній тиждень із таблицею щоденної зміни курсу (+ / - ₴)."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -429,7 +429,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Керування аватаркою — вибір фото з галереї або зйомка на камеру з вбудованим квадратним кадруванням (1:1), збереження у хмару, видалення фото та збільшення аватарки на весь екран при довгому утриманні."
+                        android:text="• Керування аватаркою — вибір фото з галереї або камери з квадратним кадруванням (1:1), збереження у хмару, видалення фото та перегляд на весь екран при довгому утриманні."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -438,7 +438,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Експорт та імпорт даних — резервне копіювання всіх транзакцій у файли CSV (з кодуванням UTF-8 BOM для коректного відкриття в Excel) або JSON, а також імпорт записів із файлу."
+                        android:text="• Експорт, імпорт та надсилання — збереження резервної копії у CSV (UTF-8 BOM для Excel) або JSON, імпорт записів із файлу, а також швидке надсилання файлу у месенджери чи на пошту в один дотик."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -447,7 +447,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Повне видалення даних — можливість вийти з облікового запису або назавжди видалити акаунт разом з усіма транзакціями після повторної перевірки безпеки."
+                        android:text="• Повне видалення даних — можливість вийти з облікового запису або назавжди видалити акаунт разом з усіма транзакціями після перевірки безпеки."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -481,7 +481,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• PIN-код та біометрія — встановлення, зміна або видалення 4-значного PIN-коду та швидке розблокування застосунку за відбитком пальця."
+                        android:text="• PIN-код та біометрія — встановлення, зміна або видалення 4-значного PIN-коду та швидке розблокування за відбитком пальця."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -490,7 +490,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Автоблокування та антибрутфорс — тимчасове блокування входу на 60 секунд після 3 невірних спроб введення PIN-коду, а також автоматичний захист екрана після 5 хвилин неактивності чи згортання програми."
+                        android:text="• Автоблокування та антибрутфорс — тимчасове блокування на 60 секунд після 3 невірних спроб введення PIN-коду, а також автоматичний захист після 5 хвилин неактивності чи згортання програми."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -499,7 +499,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Світла, темна та системна теми — перемикання оформлення прямо з нижньої панелі головного екрана з автоматичною адаптацією скляних карток, графіків і палітри іконок категорій."
+                        android:text="• Світла, темна та системна теми — перемикання оформлення прямо з нижньої панелі головного екрана з автоматичною адаптацією карток, графіків і палітри категорій."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -508,7 +508,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:lineSpacingExtra="3dp"
-                        android:text="• Контроль з’єднання з мережею — відстеження інтернету в реальному часі з плавним розмиттям фону при втраті зв’язку та автоматичним оновленням даних після відновлення мережі."
+                        android:text="• Контроль з'єднання з мережею — відстеження інтернету в реальному часі з розмиттям фону при втраті зв'язку та автоматичним оновленням даних після відновлення мережі."
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                 </LinearLayout>

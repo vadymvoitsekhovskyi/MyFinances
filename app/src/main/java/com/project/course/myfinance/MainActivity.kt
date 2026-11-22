@@ -316,6 +316,7 @@ class MainActivity : AppCompatActivity() {
             .setSingleChoiceItems(options, currentMode) { dialog, which ->
                 dialog.dismiss()
                 if (which != currentMode) {
+                    Toast.makeText(this, "Тему змінено: ${options[which]}", Toast.LENGTH_SHORT).show()
                     ThemeManager.saveAndApplyTheme(this, which)
                 }
             }
@@ -344,8 +345,11 @@ class MainActivity : AppCompatActivity() {
         networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 runOnUiThread {
+                    val wasOffline = layoutNoInternet.visibility == View.VISIBLE
                     setNoInternetVisible(false)
-                    loadTotalBalance()
+                    if (wasOffline) {
+                        Toast.makeText(this@MainActivity, "З'єднання з інтернетом відновлено", Toast.LENGTH_SHORT).show()
+                    }
                     loadTotalBalance()
                     loadTransactions()
                 }
@@ -574,6 +578,7 @@ class MainActivity : AppCompatActivity() {
         currentLimit = 30L
         isAllLoaded = false
         loadTransactions()
+        Toast.makeText(this, "Фільтри скинуто", Toast.LENGTH_SHORT).show()
     }
 
     private fun updateFilterButtonsStyle() {

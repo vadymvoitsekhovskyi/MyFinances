@@ -80,6 +80,7 @@ class LoginActivity : AppCompatActivity() {
 
                 is AuthState.Success -> {
                     progressBar.visibility = View.GONE
+                    Toast.makeText(this, "Вхід виконано успішно", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
                 }
