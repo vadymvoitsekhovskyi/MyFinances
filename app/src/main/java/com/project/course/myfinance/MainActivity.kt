@@ -59,7 +59,10 @@ class MainActivity : AppCompatActivity() {
     private var currentUsdRate: Double = 0.0
     private var currentEurRate: Double = 0.0
     private lateinit var mainContent: androidx.constraintlayout.widget.ConstraintLayout
-    private lateinit var layoutNoInternet: LinearLayout
+    private lateinit var layoutNoInternet: android.widget.FrameLayout
+    private lateinit var btnRetryConnection: ImageButton
+    private lateinit var tvRetryCountdown: TextView
+    private var retryEnableTimer: CountDownTimer? = null
     private var connectivityManager: ConnectivityManager? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var allAvailableCategories = listOf<String>()
@@ -126,6 +129,11 @@ class MainActivity : AppCompatActivity() {
 
         mainContent = findViewById(R.id.mainContent)
         layoutNoInternet = findViewById(R.id.layoutNoInternet)
+        tvRetryCountdown = findViewById(R.id.tvRetryCountdown)
+        btnRetryConnection = findViewById(R.id.btnRetryConnection)
+        btnRetryConnection.setOnClickListener {
+            retryManualReconnect()
+        }
 
         setupNetworkMonitoring()
 
@@ -379,7 +387,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setNoInternetVisible(visible: Boolean) {
+        val alreadyVisible = layoutNoInternet.visibility == View.VISIBLE
         layoutNoInternet.visibility = if (visible) View.VISIBLE else View.GONE
+
+        if (visible) {
+            if (!alreadyVisible) {
+                startRetryCooldownTimer()
+            }
+        } else {
+            retryEnableTimer?.cancel()
+            btnRetryConnection.isEnabled = false
+            btnRetryConnection.alpha = 0.35f
+            tvRetryCountdown.visibility = View.INVISIBLE
+        }
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             mainContent.setRenderEffect(
                 if (visible) {
@@ -390,6 +411,61 @@ class MainActivity : AppCompatActivity() {
                     null
                 }
             )
+        }
+    }
+
+    private fun startRetryCooldownTimer() {
+        retryEnableTimer?.cancel()
+        btnRetryConnection.isEnabled = false
+        btnRetryConnection.alpha = 0.35f
+        tvRetryCountdown.visibility = View.VISIBLE
+
+        retryEnableTimer = object : CountDownTimer(15_000L, 250L) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsLeft = kotlin.math.ceil(millisUntilFinished / 1000.0).toInt()
+                tvRetryCountdown.text = "Спробуйте підключитися через $secondsLeft с"
+            }
+
+            override fun onFinish() {
+                if (layoutNoInternet.visibility == View.VISIBLE) {
+                    btnRetryConnection.isEnabled = true
+                    btnRetryConnection.alpha = 1.0f
+                    tvRetryCountdown.visibility = View.INVISIBLE
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Можна оновити підключення вручну",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }.start()
+    }
+
+    private fun retryManualReconnect() {
+        btnRetryConnection.animate()
+            .rotationBy(360f)
+            .setDuration(450L)
+            .start()
+
+        val activeNetwork = connectivityManager?.activeNetwork
+        val capabilities = connectivityManager?.getNetworkCapabilities(activeNetwork)
+        val hasInternet =
+            capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+
+        loadTotalBalance()
+        loadTransactions()
+        loadCurrencyRates()
+
+        if (hasInternet) {
+            setNoInternetVisible(false)
+            Toast.makeText(this, "З'єднання відновлено, дані оновлено", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(
+                this,
+                "З'єднання ще відсутнє. Кнопка активується через 15 с",
+                Toast.LENGTH_SHORT
+            ).show()
+            startRetryCooldownTimer()
         }
     }
 
@@ -669,6 +745,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+
+        retryEnableTimer?.cancel()
+
         deleteCountDownTimer?.cancel()
         if (pendingDeleteIds.isNotEmpty()) {
             deleteTransactions(pendingDeleteIds.toList())
