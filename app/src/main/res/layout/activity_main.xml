@@ -29,19 +29,15 @@
                 android:orientation="horizontal"
                 android:paddingHorizontal="16dp">
 
-                <ImageView
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:layout_marginEnd="8dp"
-                    android:src="@drawable/icon" />
-
                 <TextView
+                    android:id="@+id/tvAppTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:fontFamily="sans-serif-black"
                     android:text="MyFinances"
                     android:textColor="@color/text_primary"
-                    android:textSize="28dp"
+                    android:textSize="28sp"
                     android:textStyle="bold" />
 
                 <ImageView
@@ -77,7 +73,7 @@
                         android:gravity="center"
                         android:text="U"
                         android:textColor="#FFFFFF"
-                        android:textSize="20sp"
+                        android:textSize="24sp"
                         android:textStyle="bold" />
 
                     <ImageView
@@ -142,26 +138,33 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
-            app:cardBackgroundColor="@android:color/transparent"
+            app:cardBackgroundColor="@color/dark_green"
             app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/headerContainer">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_glossy_green"
-                android:padding="24dp">
+                android:layout_height="wrap_content">
+
+                <TextureView
+                    android:id="@+id/tvBalanceVideo"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="16:9"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <LinearLayout
                     android:id="@+id/layoutBalanceText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingVertical="4dp"
-                    android:paddingEnd="8dp"
+                    android:padding="24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/ivBalanceLogo"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -179,7 +182,7 @@
                             android:layout_height="wrap_content"
                             android:text="🇺🇸 — ₴"
                             android:textColor="#E8F5E9"
-                            android:textSize="14sp"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -188,7 +191,7 @@
                             android:layout_marginHorizontal="8dp"
                             android:text="•"
                             android:textColor="#A5D6A7"
-                            android:textSize="14sp" />
+                            android:textSize="16sp" />
 
                         <TextView
                             android:id="@+id/tvEurRate"
@@ -196,14 +199,14 @@
                             android:layout_height="wrap_content"
                             android:text="🇪🇺 — ₴"
                             android:textColor="#E8F5E9"
-                            android:textSize="13sp"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="В мене на балансі"
+                        android:text="У мене на балансі"
                         android:textColor="#E8F5E9"
                         android:textSize="14sp" />
 
@@ -211,22 +214,12 @@
                         android:id="@+id/tvTotalBalance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="0dp"
-                        android:paddingVertical="0dp"
                         android:text="0.00 ₴"
                         android:textColor="#FFFFFF"
-                        android:textSize="32sp"
+                        android:textSize="28sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/ivBalanceLogo"
-                    android:layout_width="130dp"
-                    android:layout_height="130dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>

@@ -1,3 +1,27 @@
+fun getGitCommitCount(): Int {
+    return try {
+        val process = ProcessBuilder("git", "rev-list", "--count", "HEAD")
+            .directory(rootDir)
+            .redirectErrorStream(true)
+            .start()
+        process.inputStream.bufferedReader().readText().trim().toIntOrNull() ?: 1
+    } catch (e: Exception) {
+        1
+    }
+}
+
+fun getGitCommitHash(): String {
+    return try {
+        val process = ProcessBuilder("git", "rev-parse", "--short", "HEAD")
+            .directory(rootDir)
+            .redirectErrorStream(true)
+            .start()
+        process.inputStream.bufferedReader().readText().trim().ifEmpty { "local" }
+    } catch (e: Exception) {
+        "local"
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
@@ -15,13 +39,21 @@ android {
         applicationId = "com.project.course.myfinance"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+
+        val commitCount = getGitCommitCount()
+        val commitHash = getGitCommitHash()
+
+        versionCode = commitCount
+        versionName = "5.0.$commitCount ($commitHash)"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
+        debug {
+            versionNameSuffix = " • dev"
+        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(

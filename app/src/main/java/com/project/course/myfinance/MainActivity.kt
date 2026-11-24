@@ -54,6 +54,8 @@ import android.os.CountDownTimer
 import android.widget.ProgressBar
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var tvBalanceVideo: android.view.TextureView
+    private var balanceMediaPlayer: android.media.MediaPlayer? = null
     private lateinit var tvUsdRate: TextView
     private lateinit var tvEurRate: TextView
     private var currentUsdRate: Double = 0.0
@@ -78,7 +80,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvSelectedCount: TextView
     private lateinit var tvProfileLetter: TextView
     private lateinit var ivProfile: ImageView
-    private lateinit var ivBalanceLogo: ImageView
     private var currentTransactions: List<Transaction> = emptyList()
     private var currentLimit: Long = 30L
     private var isAllLoaded = false
@@ -109,12 +110,6 @@ class MainActivity : AppCompatActivity() {
     private var pendingDeleteIds: Set<String> = emptySet()
     private var rawAllTransactions: List<Transaction> = emptyList()
 
-    private val animatedIcons = listOf(
-        R.drawable.icon_anim_1,
-        R.drawable.icon_anim_2,
-        R.drawable.icon_anim_3
-    )
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -126,6 +121,11 @@ class MainActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        val tvAppTitle = findViewById<TextView>(R.id.tvAppTitle)
+        tvAppTitle.typeface =
+            android.graphics.Typeface.create("sans-serif-black", android.graphics.Typeface.BOLD)
+        tvAppTitle.paint.isFakeBoldText = true
 
         mainContent = findViewById(R.id.mainContent)
         layoutNoInternet = findViewById(R.id.layoutNoInternet)
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
         tvSelectedCount = findViewById(R.id.tvSelectedCount)
         tvProfileLetter = findViewById(R.id.tvProfileLetter)
         ivProfile = findViewById(R.id.ivProfile)
-        ivBalanceLogo = findViewById(R.id.ivBalanceLogo)
+        tvBalanceVideo = findViewById(R.id.tvBalanceVideo)
         btnResetFilters = findViewById(R.id.btnResetFilters)
         btnResetFilters.setOnClickListener { resetFilters() }
 
@@ -307,7 +307,67 @@ class MainActivity : AppCompatActivity() {
         loadCurrencyRates()
         loadTransactions()
         updateProfileIcon()
-        startAnimatedIconsLoop()
+        setupBalanceVideo()
+    }
+
+    private fun setupBalanceVideo() {
+        tvBalanceVideo.surfaceTextureListener =
+            object : android.view.TextureView.SurfaceTextureListener {
+                override fun onSurfaceTextureAvailable(
+                    surfaceTexture: android.graphics.SurfaceTexture,
+                    width: Int,
+                    height: Int
+                ) {
+                    val surface = android.view.Surface(surfaceTexture)
+                    try {
+                        val uri =
+                            android.net.Uri.parse("android.resource://$packageName/${R.raw.mycard}")
+                        balanceMediaPlayer = android.media.MediaPlayer().apply {
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                setAudioAttributes(
+                                    android.media.AudioAttributes.Builder()
+                                        .setUsage(android.media.AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MOVIE)
+                                        .build()
+                                )
+                            }
+                            setDataSource(this@MainActivity, uri)
+                            setSurface(surface)
+                            isLooping = true
+                            setVolume(0f, 0f)
+                            setOnVideoSizeChangedListener { _, w, h ->
+                                if (w > 0 && h > 0) {
+                                    val params =
+                                        tvBalanceVideo.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+                                    params.dimensionRatio = "$w:$h"
+                                    tvBalanceVideo.layoutParams = params
+                                }
+                            }
+                            setOnPreparedListener { mp ->
+                                mp.start()
+                            }
+                            prepareAsync()
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onSurfaceTextureSizeChanged(
+                    surface: android.graphics.SurfaceTexture,
+                    width: Int,
+                    height: Int
+                ) {
+                }
+
+                override fun onSurfaceTextureDestroyed(surface: android.graphics.SurfaceTexture): Boolean {
+                    balanceMediaPlayer?.release()
+                    balanceMediaPlayer = null
+                    return true
+                }
+
+                override fun onSurfaceTextureUpdated(surface: android.graphics.SurfaceTexture) {}
+            }
     }
 
     private fun updateThemeButtonIcon(btnTheme: ImageButton) {
@@ -324,7 +384,8 @@ class MainActivity : AppCompatActivity() {
             .setSingleChoiceItems(options, currentMode) { dialog, which ->
                 dialog.dismiss()
                 if (which != currentMode) {
-                    Toast.makeText(this, "Тему змінено: ${options[which]}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Тему змінено: ${options[which]}", Toast.LENGTH_SHORT)
+                        .show()
                     ThemeManager.saveAndApplyTheme(this, which)
                 }
             }
@@ -356,7 +417,11 @@ class MainActivity : AppCompatActivity() {
                     val wasOffline = layoutNoInternet.visibility == View.VISIBLE
                     setNoInternetVisible(false)
                     if (wasOffline) {
-                        Toast.makeText(this@MainActivity, "З'єднання з інтернетом відновлено", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@MainActivity,
+                            "З'єднання з інтернетом відновлено",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                     loadTotalBalance()
                     loadTransactions()
@@ -676,63 +741,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startAnimatedIconsLoop() {
-        if (animatedIcons.isNotEmpty()) {
-            animatedIcons.forEach {
-                Glide.with(this).asGif().load(it).preload()
-            }
-            playNextAnimatedIcon(0)
-        }
-    }
-
-    private fun playNextAnimatedIcon(currentIndex: Int) {
-        if (isDestroyed || isFinishing) return
-
-        var request = Glide.with(this)
-            .asGif()
-            .load(animatedIcons[currentIndex])
-
-        if (ivBalanceLogo.drawable != null) {
-            request = request.placeholder(ivBalanceLogo.drawable)
-        }
-
-        if (currentIndex == 0) {
-            request = request.transition(DrawableTransitionOptions.withCrossFade(400))
-        }
-
-        request.listener(object : RequestListener<GifDrawable> {
-            override fun onLoadFailed(
-                e: GlideException?,
-                model: Any?,
-                target: Target<GifDrawable>,
-                isFirstResource: Boolean
-            ): Boolean {
-                ivBalanceLogo.postDelayed({
-                    playNextAnimatedIcon((currentIndex + 1) % animatedIcons.size)
-                }, 1000)
-                return false
-            }
-
-            override fun onResourceReady(
-                resource: GifDrawable,
-                model: Any,
-                target: Target<GifDrawable>?,
-                dataSource: DataSource,
-                isFirstResource: Boolean
-            ): Boolean {
-                resource.setLoopCount(1)
-                resource.registerAnimationCallback(object : Animatable2Compat.AnimationCallback() {
-                    override fun onAnimationEnd(drawable: Drawable?) {
-                        resource.unregisterAnimationCallback(this)
-                        playNextAnimatedIcon((currentIndex + 1) % animatedIcons.size)
-                    }
-                })
-                return false
-            }
-        })
-            .into(ivBalanceLogo)
-    }
-
     override fun onResume() {
         super.onResume()
         if (auth.currentUser == null) {
@@ -740,10 +748,23 @@ class MainActivity : AppCompatActivity() {
             finish()
         } else {
             updateProfileIcon()
+            if (balanceMediaPlayer?.isPlaying == false) {
+                balanceMediaPlayer?.start()
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (balanceMediaPlayer?.isPlaying == true) {
+            balanceMediaPlayer?.pause()
         }
     }
 
     override fun onDestroy() {
+        balanceMediaPlayer?.release()
+        balanceMediaPlayer = null
+
         super.onDestroy()
 
         retryEnableTimer?.cancel()

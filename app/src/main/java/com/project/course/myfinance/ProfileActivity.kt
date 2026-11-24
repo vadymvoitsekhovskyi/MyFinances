@@ -219,10 +219,12 @@ class ProfileActivity : AppCompatActivity() {
                         Toast.makeText(this, "PIN-коди не співпадають", Toast.LENGTH_SHORT).show()
                         input2.text?.clear()
                     } else {
-                        val prefs = getSharedPreferences("pin_prefs", android.content.Context.MODE_PRIVATE)
+                        val prefs =
+                            getSharedPreferences("pin_prefs", android.content.Context.MODE_PRIVATE)
                         val isChanging = prefs.getString("app_pin", null) != null
                         prefs.edit().putString("app_pin", pin1).apply()
-                        val message = if (isChanging) "PIN-код успішно змінено" else "PIN-код успішно встановлено"
+                        val message =
+                            if (isChanging) "PIN-код успішно змінено" else "PIN-код успішно встановлено"
                         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                         updatePinButtons()
                         dialog.dismiss()
@@ -761,7 +763,7 @@ class ProfileActivity : AppCompatActivity() {
     private fun showAvatarOptionsDialog() {
         val hasPhoto = ivBigProfile.visibility == View.VISIBLE
         val options =
-            if (hasPhoto) arrayOf("Змінити/Редагувати", "Видалити") else arrayOf("Встановити")
+            if (hasPhoto) arrayOf("Редагувати", "Видалити") else arrayOf("Встановити")
 
         AlertDialog.Builder(this)
             .setTitle("Фото профілю")
@@ -867,7 +869,8 @@ class ProfileActivity : AppCompatActivity() {
             }
             .addOnFailureListener { e ->
                 setLoading(false)
-                Toast.makeText(this, "Помилка видалення фото: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Помилка видалення фото: ${e.message}", Toast.LENGTH_LONG)
+                    .show()
             }
     }
 
