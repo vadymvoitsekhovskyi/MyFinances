@@ -25,7 +25,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.project.course.myfinance.auth.AuthState
 import com.project.course.myfinance.auth.AuthViewModel
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseNetworkActivity() {
     private lateinit var viewModel: AuthViewModel
     private val auth = FirebaseAuth.getInstance()
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -40,11 +40,11 @@ class LoginActivity : AppCompatActivity() {
                     if (idToken != null) {
                         viewModel.googleSignIn(idToken)
                     } else {
-                        Toast.makeText(this, "Не вдалося отримати токен Google", Toast.LENGTH_SHORT)
+                        Toast.makeText(this, "Не вдалося отримати токен", Toast.LENGTH_SHORT)
                             .show()
                     }
                 } catch (e: ApiException) {
-                    Toast.makeText(this, "Помилка Google Sign In: ${e.message}", Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "Помилка авторизації: ${e.message}", Toast.LENGTH_SHORT)
                         .show()
                 }
             }

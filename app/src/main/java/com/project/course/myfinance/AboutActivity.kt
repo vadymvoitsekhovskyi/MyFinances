@@ -8,8 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
-class AboutActivity : AppCompatActivity() {
-
+class AboutActivity : BaseNetworkActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
@@ -30,7 +29,11 @@ class AboutActivity : AppCompatActivity() {
                 @Suppress("DEPRECATION")
                 packageManager.getPackageInfo(packageName, 0)
             }
-            packageInfo.versionName ?: "1.0"
+            val rawVersion = packageInfo.versionName ?: "1.0"
+            rawVersion
+                .replace(Regex("\\s*\\([^)]*(?:fatal:|warning:|safe\\.directory)[^)]*\\)"), "")
+                .replace(Regex("\\s+"), " ")
+                .trim()
         } catch (e: Exception) {
             "1.0"
         }

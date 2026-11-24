@@ -30,7 +30,7 @@ import com.project.course.myfinance.currency.HistoricalRatePoint
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-class CurrencyActivity : AppCompatActivity() {
+class CurrencyActivity : BaseNetworkActivity() {
     private lateinit var tvCardUsd: TextView
     private lateinit var tvCardEur: TextView
     private lateinit var tvRateDate: TextView
@@ -46,6 +46,10 @@ class CurrencyActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private val ratesToUah = mutableMapOf("UAH" to 1.0)
     private var selectedHistoryCurrency = "USD"
+
+    override fun onNetworkRestored() {
+        loadRatesAndHistory()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

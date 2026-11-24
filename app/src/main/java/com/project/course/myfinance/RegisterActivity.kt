@@ -19,7 +19,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.project.course.myfinance.auth.AuthState
 import com.project.course.myfinance.auth.AuthViewModel
 
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : BaseNetworkActivity() {
     private lateinit var viewModel: AuthViewModel
     private lateinit var googleSignInClient: GoogleSignInClient
 
@@ -33,11 +33,11 @@ class RegisterActivity : AppCompatActivity() {
                     if (idToken != null) {
                         viewModel.googleSignIn(idToken)
                     } else {
-                        Toast.makeText(this, "Не вдалося отримати токен Google", Toast.LENGTH_SHORT)
+                        Toast.makeText(this, "Не вдалося отримати токен", Toast.LENGTH_SHORT)
                             .show()
                     }
                 } catch (e: ApiException) {
-                    Toast.makeText(this, "Помилка Google Sign In: ${e.message}", Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "Помилка реєстрації: ${e.message}", Toast.LENGTH_SHORT)
                         .show()
                 }
             }

@@ -40,7 +40,7 @@ import java.util.TimeZone
 import kotlin.math.abs
 import kotlin.math.max
 
-class StatisticsActivity : AppCompatActivity() {
+class StatisticsActivity : BaseNetworkActivity() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val kyivTz = TimeZone.getTimeZone("Europe/Kyiv")
@@ -74,6 +74,10 @@ class StatisticsActivity : AppCompatActivity() {
     private lateinit var tvSelectedYear: TextView
     private lateinit var tvSelectedMonthInfo: TextView
     private lateinit var progressBar: ProgressBar
+
+    override fun onNetworkRestored() {
+        if (allTransactions.isEmpty()) loadData()
+    }
 
     private val expensePalette = listOf(
         Color.parseColor("#B71C1C"),

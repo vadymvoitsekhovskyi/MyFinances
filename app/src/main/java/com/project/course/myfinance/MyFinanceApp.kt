@@ -13,6 +13,7 @@ class MyFinanceApp : Application() {
     private var activitiesCount = 0
     private var currentActivity: Activity? = null
     private val inactivityHandler = Handler(Looper.getMainLooper())
+
     private val inactivityRunnable = Runnable {
         val prefs = getSharedPreferences("pin_prefs", Context.MODE_PRIVATE)
         val pin = prefs.getString("app_pin", null)

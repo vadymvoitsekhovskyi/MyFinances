@@ -112,7 +112,7 @@ class PinAuthActivity : AppCompatActivity() {
             timer = object : CountDownTimer(lockTime - currentTime, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     tvError.text =
-                        "Додаток заблоковано. Повторіть через ${millisUntilFinished / 1000} с."
+                        "Додаток заблоковано. Спробуйте ще раз через ${millisUntilFinished / 1000} с."
                 }
 
                 override fun onFinish() {

@@ -22,7 +22,7 @@ import java.util.UUID
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 
-class AddTransactionActivity : AppCompatActivity() {
+class AddTransactionActivity : BaseNetworkActivity() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private var editingTransactionId: String? = null
@@ -30,9 +30,9 @@ class AddTransactionActivity : AppCompatActivity() {
     private var existingColorIndex: Int = -1
 
     private val categories = arrayOf(
-        "Кава", "Продукти", "Надходження", "Витрати", "Борг", "Повернення",
-        "Зарплата", "Аптека", "Техніка", "Дім",
-        "Краса/Здоров'я", "Одяг", "Подарунки", "Інше"
+        "Кава", "Продукти", "Зарплата", "Надходження", "Витрати", "Борг", "Повернення",
+        "Аптека", "Техніка", "Дім", "Краса та здоров'я",
+        "Одяг", "Ресторан", "Кав'ярня", "Подарунки", "Інше"
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +69,16 @@ class AddTransactionActivity : AppCompatActivity() {
 
         val chipGroupQuickCategories =
             findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupQuickCategories)
-        val quickCategories = listOf("Кава", "Продукти", "Зарплата", "Дім", "Аптека", "Інше")
+        val quickCategories = listOf(
+            "Кава",
+            "Продукти",
+            "Зарплата",
+            "Надходження",
+            "Витрати",
+            "Дім",
+            "Аптека",
+            "Інше"
+        )
 
         quickCategories.forEach { catName ->
             val chip = com.google.android.material.chip.Chip(this).apply {
@@ -165,7 +174,7 @@ class AddTransactionActivity : AppCompatActivity() {
     ) {
         val currentUser = auth.currentUser
         if (currentUser == null) {
-            Toast.makeText(this, "Помилка: користувач не авторизований", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Користувач не авторизований", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -197,7 +206,8 @@ class AddTransactionActivity : AppCompatActivity() {
             .set(transaction)
             .addOnSuccessListener {
                 progressBar.visibility = View.GONE
-                val msg = if (editingTransactionId != null) "Зміни успішно збережено" else "Транзакцію успішно додано"
+                val msg =
+                    if (editingTransactionId != null) "Зміни успішно збережено" else "Транзакцію успішно додано"
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                 finish()
             }

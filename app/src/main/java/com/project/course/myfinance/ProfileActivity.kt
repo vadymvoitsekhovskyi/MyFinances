@@ -53,7 +53,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-class ProfileActivity : AppCompatActivity() {
+class ProfileActivity : BaseNetworkActivity() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
     private lateinit var tvBigProfileLetter: TextView

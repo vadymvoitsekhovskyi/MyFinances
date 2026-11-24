@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 import android.os.CountDownTimer
 import android.widget.ProgressBar
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseNetworkActivity() {
     private lateinit var tvBalanceVideo: android.view.TextureView
     private var balanceMediaPlayer: android.media.MediaPlayer? = null
     private lateinit var tvUsdRate: TextView
@@ -61,12 +61,6 @@ class MainActivity : AppCompatActivity() {
     private var currentUsdRate: Double = 0.0
     private var currentEurRate: Double = 0.0
     private lateinit var mainContent: androidx.constraintlayout.widget.ConstraintLayout
-    private lateinit var layoutNoInternet: android.widget.FrameLayout
-    private lateinit var btnRetryConnection: ImageButton
-    private lateinit var tvRetryCountdown: TextView
-    private var retryEnableTimer: CountDownTimer? = null
-    private var connectivityManager: ConnectivityManager? = null
-    private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var allAvailableCategories = listOf<String>()
     private lateinit var btnResetFilters: TextView
     private val auth = FirebaseAuth.getInstance()
@@ -128,14 +122,6 @@ class MainActivity : AppCompatActivity() {
         tvAppTitle.paint.isFakeBoldText = true
 
         mainContent = findViewById(R.id.mainContent)
-        layoutNoInternet = findViewById(R.id.layoutNoInternet)
-        tvRetryCountdown = findViewById(R.id.tvRetryCountdown)
-        btnRetryConnection = findViewById(R.id.btnRetryConnection)
-        btnRetryConnection.setOnClickListener {
-            retryManualReconnect()
-        }
-
-        setupNetworkMonitoring()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -376,7 +362,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showThemeSelectionDialog() {
-        val options = arrayOf("Тема пристрою", "Світла", "Темна")
+        val options = arrayOf("За умовчанням", "Світла", "Темна")
         val currentMode = ThemeManager.getSavedThemeMode(this)
 
         AlertDialog.Builder(this)
@@ -405,132 +391,6 @@ class MainActivity : AppCompatActivity() {
                 tvUsdRate.text = String.format(Locale.US, "\uD83C\uDDFA\uD83C\uDDF8 %.2f ₴", usd)
                 tvEurRate.text = String.format(Locale.US, "\uD83C\uDDEA\uD83C\uDDFA %.2f ₴", eur)
             }
-        }
-    }
-
-    private fun setupNetworkMonitoring() {
-        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        networkCallback = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                runOnUiThread {
-                    val wasOffline = layoutNoInternet.visibility == View.VISIBLE
-                    setNoInternetVisible(false)
-                    if (wasOffline) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "З'єднання з інтернетом відновлено",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    loadTotalBalance()
-                    loadTransactions()
-                }
-            }
-
-            override fun onLost(network: Network) {
-                runOnUiThread {
-                    setNoInternetVisible(true)
-                }
-            }
-        }
-
-        val networkRequest = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-
-        connectivityManager?.registerNetworkCallback(networkRequest, networkCallback!!)
-
-        val activeNetwork = connectivityManager?.activeNetwork
-        val capabilities = connectivityManager?.getNetworkCapabilities(activeNetwork)
-        val hasInternet =
-            capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-
-        if (!hasInternet) {
-            setNoInternetVisible(true)
-        }
-    }
-
-    private fun setNoInternetVisible(visible: Boolean) {
-        val alreadyVisible = layoutNoInternet.visibility == View.VISIBLE
-        layoutNoInternet.visibility = if (visible) View.VISIBLE else View.GONE
-
-        if (visible) {
-            if (!alreadyVisible) {
-                startRetryCooldownTimer()
-            }
-        } else {
-            retryEnableTimer?.cancel()
-            btnRetryConnection.isEnabled = false
-            btnRetryConnection.alpha = 0.35f
-            tvRetryCountdown.visibility = View.INVISIBLE
-        }
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            mainContent.setRenderEffect(
-                if (visible) {
-                    android.graphics.RenderEffect.createBlurEffect(
-                        25f, 25f, android.graphics.Shader.TileMode.CLAMP
-                    )
-                } else {
-                    null
-                }
-            )
-        }
-    }
-
-    private fun startRetryCooldownTimer() {
-        retryEnableTimer?.cancel()
-        btnRetryConnection.isEnabled = false
-        btnRetryConnection.alpha = 0.35f
-        tvRetryCountdown.visibility = View.VISIBLE
-
-        retryEnableTimer = object : CountDownTimer(15_000L, 250L) {
-            override fun onTick(millisUntilFinished: Long) {
-                val secondsLeft = kotlin.math.ceil(millisUntilFinished / 1000.0).toInt()
-                tvRetryCountdown.text = "Спробуйте підключитися через $secondsLeft с"
-            }
-
-            override fun onFinish() {
-                if (layoutNoInternet.visibility == View.VISIBLE) {
-                    btnRetryConnection.isEnabled = true
-                    btnRetryConnection.alpha = 1.0f
-                    tvRetryCountdown.visibility = View.INVISIBLE
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Можна оновити підключення вручну",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }.start()
-    }
-
-    private fun retryManualReconnect() {
-        btnRetryConnection.animate()
-            .rotationBy(360f)
-            .setDuration(450L)
-            .start()
-
-        val activeNetwork = connectivityManager?.activeNetwork
-        val capabilities = connectivityManager?.getNetworkCapabilities(activeNetwork)
-        val hasInternet =
-            capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-
-        loadTotalBalance()
-        loadTransactions()
-        loadCurrencyRates()
-
-        if (hasInternet) {
-            setNoInternetVisible(false)
-            Toast.makeText(this, "З'єднання відновлено, дані оновлено", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(
-                this,
-                "З'єднання ще відсутнє. Кнопка активується через 15 с",
-                Toast.LENGTH_SHORT
-            ).show()
-            startRetryCooldownTimer()
         }
     }
 
@@ -645,7 +505,7 @@ class MainActivity : AppCompatActivity() {
                 btnSortDate.text = when (which) {
                     0 -> "Сорт: Нові"
                     1 -> "Сорт: Старі"
-                    2 -> "Без комент."
+                    2 -> "Без коментарів"
                     else -> "Сорт: Нові"
                 }
                 isAllLoaded = true
@@ -767,8 +627,6 @@ class MainActivity : AppCompatActivity() {
 
         super.onDestroy()
 
-        retryEnableTimer?.cancel()
-
         deleteCountDownTimer?.cancel()
         if (pendingDeleteIds.isNotEmpty()) {
             deleteTransactions(pendingDeleteIds.toList())
@@ -776,7 +634,12 @@ class MainActivity : AppCompatActivity() {
         }
         snapshotListener?.remove()
         balanceListener?.remove()
-        networkCallback?.let { connectivityManager?.unregisterNetworkCallback(it) }
+    }
+
+    override fun onNetworkRestored() {
+        loadTotalBalance()
+        loadTransactions()
+        loadCurrencyRates()
     }
 
     private fun updateProfileIcon() {
