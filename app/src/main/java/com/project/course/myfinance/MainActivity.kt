@@ -145,12 +145,6 @@ class MainActivity : BaseNetworkActivity() {
         btnResetFilters = findViewById(R.id.btnResetFilters)
         btnResetFilters.setOnClickListener { resetFilters() }
 
-        val btnTheme = findViewById<ImageButton>(R.id.btnTheme)
-        updateThemeButtonIcon(btnTheme)
-        btnTheme.setOnClickListener {
-            showThemeSelectionDialog()
-        }
-
         val cvProfile = findViewById<CardView>(R.id.cvProfile)
         val layoutBalanceText = findViewById<LinearLayout>(R.id.layoutBalanceText)
         val btnCloseSelection = findViewById<ImageView>(R.id.btnCloseSelection)
@@ -198,14 +192,6 @@ class MainActivity : BaseNetworkActivity() {
         tvUsdRate = findViewById(R.id.tvUsdRate)
         tvEurRate = findViewById(R.id.tvEurRate)
 
-        findViewById<ImageButton>(R.id.btnCurrency).setOnClickListener {
-            val intent = Intent(this, CurrencyActivity::class.java).apply {
-                putExtra("EXTRA_USD_RATE", currentUsdRate)
-                putExtra("EXTRA_EUR_RATE", currentEurRate)
-            }
-            startActivity(intent)
-        }
-
         btnFilterType.setOnClickListener { showTypeFilterDialog() }
         btnFilterCategory.setOnClickListener { showCategoryFilterDialog() }
         btnFilterSpecificDate.setOnClickListener { showSpecificDatePicker() }
@@ -217,7 +203,11 @@ class MainActivity : BaseNetworkActivity() {
 
         val btnStatistics = findViewById<ImageView>(R.id.btnStatistics)
         btnStatistics.setOnClickListener {
-            startActivity(Intent(this, StatisticsActivity::class.java))
+            val intent = Intent(this, StatisticsActivity::class.java).apply {
+                putExtra("EXTRA_USD_RATE", currentUsdRate)
+                putExtra("EXTRA_EUR_RATE", currentEurRate)
+            }
+            startActivity(intent)
         }
 
         btnScrollUp.setOnClickListener {
@@ -354,29 +344,6 @@ class MainActivity : BaseNetworkActivity() {
 
                 override fun onSurfaceTextureUpdated(surface: android.graphics.SurfaceTexture) {}
             }
-    }
-
-    private fun updateThemeButtonIcon(btnTheme: ImageButton) {
-        val isDark = ThemeManager.isDarkThemeActive(this)
-        btnTheme.setImageResource(if (isDark) R.drawable.ic_moon else R.drawable.ic_sun)
-    }
-
-    private fun showThemeSelectionDialog() {
-        val options = arrayOf("За умовчанням", "Світла", "Темна")
-        val currentMode = ThemeManager.getSavedThemeMode(this)
-
-        AlertDialog.Builder(this)
-            .setTitle("Тема застосунку")
-            .setSingleChoiceItems(options, currentMode) { dialog, which ->
-                dialog.dismiss()
-                if (which != currentMode) {
-                    Toast.makeText(this, "Тему змінено: ${options[which]}", Toast.LENGTH_SHORT)
-                        .show()
-                    ThemeManager.saveAndApplyTheme(this, which)
-                }
-            }
-            .setNegativeButton("Скасувати", null)
-            .show()
     }
 
     private fun loadCurrencyRates() {

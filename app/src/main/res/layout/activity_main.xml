@@ -73,7 +73,7 @@
                         android:gravity="center"
                         android:text="U"
                         android:textColor="#FFFFFF"
-                        android:textSize="24sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <ImageView
@@ -467,38 +467,10 @@
                 android:stateListAnimator="@null"
                 app:tint="@color/dark_green" />
 
-            <ImageButton
-                android:id="@+id/btnTheme"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="4dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Вибір теми"
-                android:elevation="0dp"
-                android:padding="11dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_sun"
-                android:stateListAnimator="@null"
-                app:tint="@color/dark_green" />
-
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
-
-            <ImageButton
-                android:id="@+id/btnCurrency"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="12dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Курси валют та конвертер"
-                android:elevation="0dp"
-                android:padding="10dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_currency"
-                android:stateListAnimator="@null"
-                app:tint="@color/dark_green" />
 
             <ImageButton
                 android:id="@+id/btnAddTransaction"

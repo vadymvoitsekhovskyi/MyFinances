@@ -150,6 +150,15 @@ class ProfileActivity : BaseNetworkActivity() {
 
         updatePinButtons()
 
+        val btnTheme = findViewById<Button>(R.id.btnTheme)
+        val themeOptions = arrayOf("За умовчанням", "Світла", "Темна")
+        val currentThemeMode = ThemeManager.getSavedThemeMode(this)
+        btnTheme.text = "Тема: ${themeOptions.getOrElse(currentThemeMode) { "За умовчанням" }}"
+
+        btnTheme.setOnClickListener {
+            showThemeSelectionDialog()
+        }
+
         btnSetPin.setOnClickListener {
             val layout = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
@@ -373,6 +382,24 @@ class ProfileActivity : BaseNetworkActivity() {
         btnSendData.setOnClickListener { showShareDialog() }
         btnLogout.setOnClickListener { showLogoutDialog() }
         btnDeleteAccount.setOnClickListener { showDeleteAccountDialog() }
+    }
+
+    private fun showThemeSelectionDialog() {
+        val options = arrayOf("За умовчанням", "Світла", "Темна")
+        val currentMode = ThemeManager.getSavedThemeMode(this)
+
+        AlertDialog.Builder(this)
+            .setTitle("Тема застосунку")
+            .setSingleChoiceItems(options, currentMode) { dialog, which ->
+                dialog.dismiss()
+                if (which != currentMode) {
+                    Toast.makeText(this, "Тему змінено: ${options[which]}", Toast.LENGTH_SHORT)
+                        .show()
+                    ThemeManager.saveAndApplyTheme(this, which)
+                }
+            }
+            .setNegativeButton("Скасувати", null)
+            .show()
     }
 
     private fun showZoomedAvatar() {

@@ -76,7 +76,7 @@
             android:gravity="center"
             android:text="U"
             android:textColor="#FFFFFF"
-            android:textSize="72sp"
+            android:textSize="68sp"
             android:textStyle="bold" />
 
         <ImageView
@@ -224,6 +224,15 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btnTheme"
+                    style="@style/GlossyOutlineButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Тема застосунку"
+                    android:textColor="@color/text_primary" />
 
                 <Button
                     android:id="@+id/btnSetPin"

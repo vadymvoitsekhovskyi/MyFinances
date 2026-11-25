@@ -39,6 +39,8 @@ import java.util.Locale
 import java.util.TimeZone
 import kotlin.math.abs
 import kotlin.math.max
+import android.content.Intent
+import android.widget.ImageButton
 
 class StatisticsActivity : BaseNetworkActivity() {
     private val db = FirebaseFirestore.getInstance()
@@ -74,6 +76,8 @@ class StatisticsActivity : BaseNetworkActivity() {
     private lateinit var tvSelectedYear: TextView
     private lateinit var tvSelectedMonthInfo: TextView
     private lateinit var progressBar: ProgressBar
+    private var currentUsdRate: Double = 0.0
+    private var currentEurRate: Double = 0.0
 
     override fun onNetworkRestored() {
         if (allTransactions.isEmpty()) loadData()
@@ -108,6 +112,17 @@ class StatisticsActivity : BaseNetworkActivity() {
         setContentView(R.layout.activity_statistics)
 
         findViewById<ImageView>(R.id.btnBack).setOnClickListener { finish() }
+
+        currentUsdRate = intent.getDoubleExtra("EXTRA_USD_RATE", 0.0)
+        currentEurRate = intent.getDoubleExtra("EXTRA_EUR_RATE", 0.0)
+
+        findViewById<ImageButton>(R.id.btnCurrency).setOnClickListener {
+            val currencyIntent = Intent(this, CurrencyActivity::class.java).apply {
+                putExtra("EXTRA_USD_RATE", currentUsdRate)
+                putExtra("EXTRA_EUR_RATE", currentEurRate)
+            }
+            startActivity(currencyIntent)
+        }
 
         btnPeriodToday = findViewById(R.id.btnPeriodToday)
         btnPeriodYesterday = findViewById(R.id.btnPeriodYesterday)

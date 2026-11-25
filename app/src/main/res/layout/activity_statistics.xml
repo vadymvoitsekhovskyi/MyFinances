@@ -28,14 +28,28 @@
             app:tint="@color/text_primary" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_weight="1"
             android:includeFontPadding="false"
             android:text="Аналітика та звіт"
             android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnCurrency"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_glossy_pin"
+            android:contentDescription="Курси валют та конвертер"
+            android:elevation="0dp"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_currency"
+            android:stateListAnimator="@null"
+            app:tint="@color/dark_green" />
     </LinearLayout>
 
     <HorizontalScrollView
