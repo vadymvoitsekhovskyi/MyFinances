@@ -322,9 +322,4 @@ class CurrencyActivity : BaseNetworkActivity() {
             layoutRateHistoryList.addView(row)
         }
     }
-
-    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        (application as? MyFinanceApp)?.resetInactivityTimer()
-        return super.dispatchTouchEvent(event)
-    }
 }

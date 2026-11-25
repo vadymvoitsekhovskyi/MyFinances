@@ -178,6 +178,15 @@ open class BaseNetworkActivity : AppCompatActivity() {
         }
     }
 
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        resetInactivityTimer()
+    }
+
+    protected fun resetInactivityTimer() {
+        (application as? MyFinanceApp)?.resetInactivityTimer()
+    }
+
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         (application as? MyFinanceApp)?.resetInactivityTimer()
         return super.dispatchTouchEvent(event)

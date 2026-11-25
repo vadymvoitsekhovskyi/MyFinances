@@ -173,6 +173,7 @@ class MainActivity : BaseNetworkActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: android.text.Editable?) {
+                resetInactivityTimer()
                 currentSearchQuery = s?.toString()?.trim() ?: ""
                 if (currentSearchQuery.isNotBlank()) {
                     isAllLoaded = true
@@ -1128,8 +1129,6 @@ class MainActivity : BaseNetworkActivity() {
     }
 
     override fun dispatchTouchEvent(event: android.view.MotionEvent): Boolean {
-        (application as? MyFinanceApp)?.resetInactivityTimer()
-
         if (event.action == android.view.MotionEvent.ACTION_DOWN) {
             val currentFocus = currentFocus
             if (currentFocus is com.google.android.material.textfield.TextInputEditText) {

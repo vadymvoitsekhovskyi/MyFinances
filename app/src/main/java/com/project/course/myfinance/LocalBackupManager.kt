@@ -75,14 +75,12 @@ object LocalBackupManager {
 
             val transactions = snapshot.toObjects(Transaction::class.java)
 
-            // 1. Перезапис CSV
             val csvFile = getBackupFile(context, "csv")
             csvFile.outputStream().use { out ->
                 out.write(byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte()))
                 out.write(buildCsvString(transactions).toByteArray(Charsets.UTF_8))
             }
 
-            // 2. Перезапис JSON
             val jsonFile = getBackupFile(context, "json")
             jsonFile.outputStream().use { out ->
                 out.write(buildJsonString(transactions).toByteArray(Charsets.UTF_8))

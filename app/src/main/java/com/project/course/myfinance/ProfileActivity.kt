@@ -52,6 +52,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import java.util.UUID
 
 class ProfileActivity : BaseNetworkActivity() {
     private val auth = FirebaseAuth.getInstance()
@@ -66,8 +67,6 @@ class ProfileActivity : BaseNetworkActivity() {
     private lateinit var layoutSystem: LinearLayout
     private var currentExportFormat: String = "csv"
     private val gson = Gson()
-    private val WEB_CLIENT_ID =
-        "789190818561-pfb6m4vr207b90s5r1ku8pm07bl070i2.apps.googleusercontent.com"
     private lateinit var googleSignInClient: GoogleSignInClient
     private var onGoogleReAuthSuccess: (() -> Unit)? = null
 
@@ -129,7 +128,7 @@ class ProfileActivity : BaseNetworkActivity() {
         setContentView(R.layout.activity_profile)
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(WEB_CLIENT_ID)
+            .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
@@ -346,7 +345,6 @@ class ProfileActivity : BaseNetworkActivity() {
             )
         }
 
-// Іконки JSON
         findViewById<android.widget.ImageButton>(R.id.btnShareJson).setOnClickListener {
             sharePreparedFile(
                 "json"
@@ -563,46 +561,6 @@ class ProfileActivity : BaseNetworkActivity() {
         }
     }
 
-    override fun dispatchTouchEvent(event: android.view.MotionEvent): Boolean {
-        (application as? MyFinanceApp)?.resetInactivityTimer()
-        return super.dispatchTouchEvent(event)
-    }
-
-    private fun showExportDialog() {
-        val formats = arrayOf("CSV", "JSON")
-        AlertDialog.Builder(this)
-            .setTitle("Оберіть формат експорту")
-            .setItems(formats) { _, which ->
-                currentExportFormat = if (which == 0) "csv" else "json"
-                val fileName = "myfinance_backup_${System.currentTimeMillis()}.$currentExportFormat"
-                exportLauncher.launch(fileName)
-            }
-            .show()
-    }
-
-    private fun showImportDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Імпорт даних")
-            .setMessage("Оберіть файл формату CSV або JSON. Зверніть увагу, що нові транзакції будуть додані до вашого поточного списку.")
-            .setPositiveButton("Вибрати файл") { _, _ ->
-                importLauncher.launch("*/*")
-            }
-            .setNegativeButton("Скасувати", null)
-            .show()
-    }
-
-    private fun showShareDialog() {
-        val formats = arrayOf("CSV", "JSON")
-        AlertDialog.Builder(this)
-            .setTitle("Оберіть формат для надсилання")
-            .setItems(formats) { _, which ->
-                val format = if (which == 0) "csv" else "json"
-                performShare(format)
-            }
-            .setNegativeButton("Скасувати", null)
-            .show()
-    }
-
     private fun performExport(uri: Uri) {
         val user = auth.currentUser ?: return
         setLoading(true)
@@ -694,7 +652,8 @@ class ProfileActivity : BaseNetworkActivity() {
                         }
 
                         Transaction(
-                            id = map["id"] as? String ?: "",
+                            id = (map["id"] as? String)?.trim().orEmpty()
+                                .ifBlank { UUID.randomUUID().toString() },
                             type = map["type"] as? String ?: "",
                             category = map["category"] as? String ?: "",
                             amount = (map["amount"] as? Double) ?: 0.0,
@@ -746,100 +705,6 @@ class ProfileActivity : BaseNetworkActivity() {
         }
     }
 
-    private fun performShare(format: String) {
-        val user = auth.currentUser ?: return
-        setLoading(true)
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val snapshot = db.collection("users").document(user.uid)
-                    .collection("transactions").get().await()
-
-                val transactions = snapshot.toObjects(Transaction::class.java)
-                if (transactions.isEmpty()) {
-                    withContext(Dispatchers.Main) {
-                        setLoading(false)
-                        Toast.makeText(
-                            this@ProfileActivity,
-                            "Немає транзакцій для надсилання",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    return@launch
-                }
-
-                val content = if (format == "json") {
-                    val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-                    sdf.timeZone = TimeZone.getTimeZone("Europe/Kyiv")
-
-                    val jsonList = transactions.map { t ->
-                        mapOf(
-                            "id" to t.id,
-                            "type" to t.type,
-                            "category" to t.category,
-                            "amount" to t.amount,
-                            "date" to sdf.format(Date(t.date)),
-                            "comment" to t.comment
-                        )
-                    }
-                    gson.toJson(jsonList)
-                } else {
-                    buildCsvString(transactions)
-                }
-
-                val shareDir = File(cacheDir, "shared_backups").apply {
-                    if (!exists()) mkdirs()
-                    listFiles()?.forEach { it.delete() }
-                }
-
-                val fileName = "myfinance_backup_${System.currentTimeMillis()}.$format"
-                val file = File(shareDir, fileName)
-
-                file.outputStream().use { outputStream ->
-                    if (format == "csv") {
-                        outputStream.write(byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte()))
-                    }
-                    outputStream.write(content.toByteArray(Charsets.UTF_8))
-                }
-
-                val uri = FileProvider.getUriForFile(
-                    this@ProfileActivity,
-                    "${packageName}.fileprovider",
-                    file
-                )
-
-                val mimeType = if (format == "json") "application/json" else "text/csv"
-
-                val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                    type = mimeType
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                    putExtra(Intent.EXTRA_SUBJECT, "Транзакції MyFinances: $fileName")
-                    clipData = ClipData.newRawUri(fileName, uri)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                }
-
-                withContext(Dispatchers.Main) {
-                    setLoading(false)
-                    Toast.makeText(
-                        this@ProfileActivity,
-                        "Файл ${format.uppercase()} готовий до надсилання",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    startActivity(Intent.createChooser(shareIntent, "Надіслати файл через"))
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    setLoading(false)
-                    Toast.makeText(
-                        this@ProfileActivity,
-                        "Помилка підготовки файлу: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-        }
-    }
-
     private fun buildCsvString(transactions: List<Transaction>): String {
         val builder = java.lang.StringBuilder()
         builder.append("id,type,category,amount,date,comment\n")
@@ -870,7 +735,7 @@ class ProfileActivity : BaseNetworkActivity() {
             val line = lines[i].trim()
             if (line.isEmpty()) continue
 
-            val tokens = line.split(csvRegex).map { it.trim('\"') }
+            val tokens = line.split(csvRegex).map { it.trim('\"').replace("\"\"", "\"") }
             if (tokens.size >= 5) {
                 try {
                     val parsedDateLong = try {
@@ -881,7 +746,7 @@ class ProfileActivity : BaseNetworkActivity() {
 
                     list.add(
                         Transaction(
-                            id = tokens[0],
+                            id = tokens[0].trim().ifBlank { UUID.randomUUID().toString() },
                             type = tokens[1],
                             category = tokens[2],
                             amount = tokens[3].toDoubleOrNull() ?: 0.0,

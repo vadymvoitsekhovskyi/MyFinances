@@ -38,9 +38,4 @@ class AboutActivity : BaseNetworkActivity() {
             "1.0"
         }
     }
-
-    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        (application as? MyFinanceApp)?.resetInactivityTimer()
-        return super.dispatchTouchEvent(event)
-    }
 }
