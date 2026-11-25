@@ -41,6 +41,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import android.content.Intent
 import android.widget.ImageButton
+import android.app.DatePickerDialog
 
 class StatisticsActivity : BaseNetworkActivity() {
     private val db = FirebaseFirestore.getInstance()
@@ -78,6 +79,18 @@ class StatisticsActivity : BaseNetworkActivity() {
     private lateinit var progressBar: ProgressBar
     private var currentUsdRate: Double = 0.0
     private var currentEurRate: Double = 0.0
+
+    private lateinit var btnPeriodCustomDate: Button
+    private lateinit var tvReportBalance: TextView
+    private var selectedCustomDateMillis: Long? = null
+    private var isRecordedBalanceVisible = false
+    private var recordedBalance = 0.0
+
+    private data class PeriodReportData(
+        val transactions: List<Transaction>,
+        val daysCount: Int,
+        val periodEndMillis: Long
+    )
 
     override fun onNetworkRestored() {
         if (allTransactions.isEmpty()) loadData()
@@ -133,6 +146,14 @@ class StatisticsActivity : BaseNetworkActivity() {
         btnPeriodAll = findViewById(R.id.btnPeriodAll)
 
         tvReportPeriodTitle = findViewById(R.id.tvReportPeriodTitle)
+        btnPeriodCustomDate = findViewById(R.id.btnPeriodCustomDate)
+        tvReportBalance = findViewById(R.id.tvReportBalance)
+
+        tvReportBalance.setOnClickListener {
+            isRecordedBalanceVisible = !isRecordedBalanceVisible
+            updateRecordedBalanceUI()
+        }
+
         tvReportIncome = findViewById(R.id.tvReportIncome)
         tvReportExpense = findViewById(R.id.tvReportExpense)
         tvReportNet = findViewById(R.id.tvReportNet)
@@ -180,12 +201,49 @@ class StatisticsActivity : BaseNetworkActivity() {
             button.setOnClickListener {
                 if (selectedPeriod != periodKey) {
                     selectedPeriod = periodKey
+                    selectedCustomDateMillis = null
+                    btnPeriodCustomDate.text = "Обрати дату"
                     updatePeriodButtonStyles(periodMap)
                     refreshPeriodAnalytics()
                 }
             }
         }
+
+        btnPeriodCustomDate.setOnClickListener {
+            showCustomDatePicker(periodMap)
+        }
+
         updatePeriodButtonStyles(periodMap)
+    }
+
+    private fun showCustomDatePicker(periodMap: Map<String, Button>) {
+        val calendar = Calendar.getInstance(kyivTz)
+        if (selectedCustomDateMillis != null) {
+            calendar.timeInMillis = selectedCustomDateMillis!!
+        }
+
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+            val chosenCal = Calendar.getInstance(kyivTz).apply {
+                set(selectedYear, selectedMonth, selectedDay, 0, 0, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            selectedCustomDateMillis = chosenCal.timeInMillis
+            selectedPeriod = "custom_date"
+
+            val btnFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).apply {
+                timeZone = kyivTz
+            }
+            btnPeriodCustomDate.text = btnFormatter.format(chosenCal.time)
+            updatePeriodButtonStyles(periodMap)
+            refreshPeriodAnalytics()
+        }, year, month, day)
+
+        datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
+        datePickerDialog.show()
     }
 
     private fun updatePeriodButtonStyles(periodMap: Map<String, Button>) {
@@ -197,6 +255,14 @@ class StatisticsActivity : BaseNetworkActivity() {
                 button.setBackgroundResource(R.drawable.bg_glossy_outline)
                 button.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
             }
+        }
+
+        if (selectedPeriod == "custom_date") {
+            btnPeriodCustomDate.setBackgroundResource(R.drawable.bg_glossy_green)
+            btnPeriodCustomDate.setTextColor(ContextCompat.getColor(this, R.color.white_soft))
+        } else {
+            btnPeriodCustomDate.setBackgroundResource(R.drawable.bg_glossy_outline)
+            btnPeriodCustomDate.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
         }
     }
 
@@ -271,7 +337,7 @@ class StatisticsActivity : BaseNetworkActivity() {
             }
     }
 
-    private fun getFilteredTransactionsForPeriod(): Pair<List<Transaction>, Int> {
+    private fun getFilteredTransactionsForPeriod(): PeriodReportData {
         val now = System.currentTimeMillis()
         val cal = Calendar.getInstance(kyivTz)
 
@@ -280,12 +346,18 @@ class StatisticsActivity : BaseNetworkActivity() {
                 tvReportPeriodTitle.text = "Звіт за сьогодні"
                 val todayYear = cal.get(Calendar.YEAR)
                 val todayDayOfYear = cal.get(Calendar.DAY_OF_YEAR)
+                val endOfToday = (cal.clone() as Calendar).apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                    set(Calendar.MILLISECOND, 999)
+                }.timeInMillis
 
                 val filtered = allTransactions.filter {
                     cal.timeInMillis = it.date
                     cal.get(Calendar.YEAR) == todayYear && cal.get(Calendar.DAY_OF_YEAR) == todayDayOfYear
                 }
-                filtered to 1
+                PeriodReportData(filtered, 1, endOfToday)
             }
 
             "yesterday" -> {
@@ -297,24 +369,56 @@ class StatisticsActivity : BaseNetworkActivity() {
 
                 val yesterdayYear = cal.get(Calendar.YEAR)
                 val yesterdayDayOfYear = cal.get(Calendar.DAY_OF_YEAR)
+                val endOfYesterday = (cal.clone() as Calendar).apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                    set(Calendar.MILLISECOND, 999)
+                }.timeInMillis
 
                 val filtered = allTransactions.filter {
                     cal.timeInMillis = it.date
                     cal.get(Calendar.YEAR) == yesterdayYear && cal.get(Calendar.DAY_OF_YEAR) == yesterdayDayOfYear
                 }
-                filtered to 1
+                PeriodReportData(filtered, 1, endOfYesterday)
+            }
+
+            "custom_date" -> {
+                val targetMillis = selectedCustomDateMillis ?: now
+                cal.timeInMillis = targetMillis
+                val dateStr = SimpleDateFormat("dd MMMM yyyy", Locale("uk", "UA")).apply {
+                    timeZone = kyivTz
+                }.format(cal.time)
+                tvReportPeriodTitle.text = "Звіт за $dateStr"
+
+                val startOfDay = (cal.clone() as Calendar).apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.timeInMillis
+
+                val endOfDay = (cal.clone() as Calendar).apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                    set(Calendar.MILLISECOND, 999)
+                }.timeInMillis
+
+                val filtered = allTransactions.filter { it.date in startOfDay..endOfDay }
+                PeriodReportData(filtered, 1, endOfDay)
             }
 
             "7d" -> {
                 tvReportPeriodTitle.text = "Звіт за останні 7 днів"
                 val start = now - 7L * 24 * 60 * 60 * 1000
-                allTransactions.filter { it.date >= start } to 7
+                PeriodReportData(allTransactions.filter { it.date >= start }, 7, now)
             }
 
             "30d" -> {
                 tvReportPeriodTitle.text = "Звіт за останні 30 днів"
                 val start = now - 30L * 24 * 60 * 60 * 1000
-                allTransactions.filter { it.date >= start } to 30
+                PeriodReportData(allTransactions.filter { it.date >= start }, 30, now)
             }
 
             "month" -> {
@@ -326,37 +430,60 @@ class StatisticsActivity : BaseNetworkActivity() {
                 val currentMonth = cal.get(Calendar.MONTH)
                 val currentYear = cal.get(Calendar.YEAR)
                 val daysPassed = max(1, cal.get(Calendar.DAY_OF_MONTH))
+                val endOfMonth = (cal.clone() as Calendar).apply {
+                    set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                    set(Calendar.MILLISECOND, 999)
+                }.timeInMillis
 
                 val filtered = allTransactions.filter {
                     cal.timeInMillis = it.date
                     cal.get(Calendar.YEAR) == currentYear && cal.get(Calendar.MONTH) == currentMonth
                 }
-                filtered to daysPassed
+                PeriodReportData(filtered, daysPassed, endOfMonth)
             }
 
             "year" -> {
                 val currentYear = cal.get(Calendar.YEAR)
                 tvReportPeriodTitle.text = "Звіт за $currentYear рік"
                 val daysPassed = max(1, cal.get(Calendar.DAY_OF_YEAR))
+                val endOfYear = (cal.clone() as Calendar).apply {
+                    set(Calendar.MONTH, Calendar.DECEMBER)
+                    set(Calendar.DAY_OF_MONTH, 31)
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                    set(Calendar.MILLISECOND, 999)
+                }.timeInMillis
 
                 val filtered = allTransactions.filter {
                     cal.timeInMillis = it.date
                     cal.get(Calendar.YEAR) == currentYear
                 }
-                filtered to daysPassed
+                PeriodReportData(filtered, daysPassed, endOfYear)
             }
 
             else -> {
                 tvReportPeriodTitle.text = "Звіт за весь період"
                 val minDate = allTransactions.minOfOrNull { it.date } ?: now
+                val maxDate = allTransactions.maxOfOrNull { it.date } ?: now
                 val daysSpan = max(1, ((now - minDate) / (24L * 60 * 60 * 1000)).toInt() + 1)
-                allTransactions to daysSpan
+                PeriodReportData(allTransactions, daysSpan, max(now, maxDate))
             }
         }
     }
 
     private fun refreshPeriodAnalytics() {
-        val (filtered, daysCount) = getFilteredTransactionsForPeriod()
+        val reportData = getFilteredTransactionsForPeriod()
+        val filtered = reportData.transactions
+        val daysCount = reportData.daysCount
+
+        recordedBalance = allTransactions
+            .filter { it.date <= reportData.periodEndMillis }
+            .sumOf { if (it.type == "income") it.amount else -it.amount }
+        updateRecordedBalanceUI()
 
         val totalIncome = filtered.filter { it.type == "income" }.sumOf { it.amount }
         val totalExpense = filtered.filter { it.type == "expense" }.sumOf { it.amount }
@@ -396,6 +523,14 @@ class StatisticsActivity : BaseNetworkActivity() {
             centerLabel = "Доходи"
         )
         buildDailyBarChart(filtered)
+    }
+
+    private fun updateRecordedBalanceUI() {
+        tvReportBalance.text = if (isRecordedBalanceVisible) {
+            String.format(Locale.US, "%.2f ₴", recordedBalance)
+        } else {
+            "••••• ₴"
+        }
     }
 
     private fun buildSmartInsight(

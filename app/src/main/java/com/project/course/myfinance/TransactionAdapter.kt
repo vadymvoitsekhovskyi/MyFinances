@@ -22,9 +22,6 @@ class TransactionAdapter(
 ) : RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
 
     val selectedIds = mutableSetOf<String>()
-    private var dailyBalances: Map<String, Double> = emptyMap()
-    private var dailyExpenses: Map<String, Double> = emptyMap()
-    private var dailyIncomes: Map<String, Double> = emptyMap()
     private val timeZone = TimeZone.getTimeZone("Europe/Kyiv")
 
     private val yearFormatter = SimpleDateFormat("yyyy", Locale("uk", "UA")).apply {
@@ -43,14 +40,9 @@ class TransactionAdapter(
         this.timeZone = this@TransactionAdapter.timeZone
     }
 
-    private var isHistoricalBalancesVisible = false
-
     class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val layoutDateHeader: LinearLayout = itemView.findViewById(R.id.layoutDateHeader)
         val tvDateHeader: TextView = itemView.findViewById(R.id.tvDateHeader)
-        val tvHistoricalBalance: TextView = itemView.findViewById(R.id.tvHistoricalBalance)
-        val tvDateIncome: TextView = itemView.findViewById(R.id.tvDateIncome)
-        val tvDateExpense: TextView = itemView.findViewById(R.id.tvDateExpense)
         val tvCategoryEmoji: TextView = itemView.findViewById(R.id.tvCategoryEmoji)
         val tvCategory: TextView = itemView.findViewById(R.id.tvCategory)
         val tvTime: TextView = itemView.findViewById(R.id.tvTime)
@@ -93,34 +85,6 @@ class TransactionAdapter(
         if (showDate) {
             holder.layoutDateHeader.visibility = View.VISIBLE
             holder.tvDateHeader.text = currentDayMonthStr
-
-            val endOfDayBalance = dailyBalances[currentExactDateStr]
-            if (endOfDayBalance != null) {
-                holder.tvHistoricalBalance.visibility = View.VISIBLE
-
-                if (isHistoricalBalancesVisible) {
-                    holder.tvHistoricalBalance.text =
-                        String.format(Locale.US, "Баланс: %.2f ₴", endOfDayBalance)
-                } else {
-                    holder.tvHistoricalBalance.text = "Баланс: ••••• ₴"
-                }
-
-                holder.tvHistoricalBalance.setOnClickListener {
-                    isHistoricalBalancesVisible = !isHistoricalBalancesVisible
-                    notifyDataSetChanged()
-                }
-            } else {
-                holder.tvHistoricalBalance.visibility = View.GONE
-            }
-
-            val dayIncome = dailyIncomes[currentExactDateStr] ?: 0.0
-            val dayExpense = dailyExpenses[currentExactDateStr] ?: 0.0
-
-            holder.tvDateIncome.text = String.format(Locale.US, "+ %.2f ₴", dayIncome)
-            holder.tvDateIncome.visibility = View.VISIBLE
-
-            holder.tvDateExpense.text = String.format(Locale.US, "- %.2f ₴", dayExpense)
-            holder.tvDateExpense.visibility = View.VISIBLE
         }
 
         holder.tvCategoryEmoji.text = getCategoryEmoji(transaction.category, transaction.type)
@@ -230,17 +194,6 @@ class TransactionAdapter(
 
     fun updateData(newTransactions: List<Transaction>) {
         transactions = newTransactions
-        notifyDataSetChanged()
-    }
-
-    fun updateDailyStats(
-        newBalances: Map<String, Double>,
-        newExpenses: Map<String, Double>,
-        newIncomes: Map<String, Double>
-    ) {
-        dailyBalances = newBalances
-        dailyExpenses = newExpenses
-        dailyIncomes = newIncomes
         notifyDataSetChanged()
     }
 

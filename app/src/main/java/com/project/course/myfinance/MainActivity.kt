@@ -97,9 +97,6 @@ class MainActivity : BaseNetworkActivity() {
     private lateinit var btnSortDate: Button
     private var isBalanceVisible = false
     private var currentTotalBalance = 0.0
-    private var dailyBalancesMap = mapOf<String, Double>()
-    private var dailyExpensesMap = mapOf<String, Double>()
-    private var dailyIncomesMap = mapOf<String, Double>()
     private var currentSearchQuery: String = ""
     private lateinit var layoutUndoDelete: LinearLayout
     private lateinit var pbUndoTimer: ProgressBar
@@ -770,49 +767,22 @@ class MainActivity : BaseNetworkActivity() {
 
     private fun recalculateBalances() {
         val activeTrans = rawAllTransactions.filter { it.id !in pendingDeleteIds }
-        val sortedTrans = activeTrans.sortedBy { it.date }
         allAvailableCategories = activeTrans.map { it.category }.distinct().sorted()
 
         var totalBalance = 0.0
-        val balancesMap = mutableMapOf<String, Double>()
-        val expensesMap = mutableMapOf<String, Double>()
-        val incomesMap = mutableMapOf<String, Double>()
-
-        val exactDateFormatter =
-            SimpleDateFormat("ddMMyyyy", Locale.getDefault()).apply {
-                this.timeZone = TimeZone.getTimeZone("Europe/Kyiv")
-            }
-
-        for (t in sortedTrans) {
-            val dateStr = exactDateFormatter.format(Date(t.date))
-
+        for (t in activeTrans) {
             if (t.type == "income") {
                 totalBalance += t.amount
-                incomesMap[dateStr] = (incomesMap[dateStr] ?: 0.0) + t.amount
             } else {
                 totalBalance -= t.amount
-                expensesMap[dateStr] = (expensesMap[dateStr] ?: 0.0) + t.amount
             }
-
-            balancesMap[dateStr] = totalBalance
         }
 
         currentTotalBalance = totalBalance
-        dailyBalancesMap = balancesMap
-        dailyExpensesMap = expensesMap
-        dailyIncomesMap = incomesMap
 
         if (isBalanceVisible) {
             tvTotalBalance.text =
                 String.format(Locale.US, "%.2f ₴", currentTotalBalance)
-        }
-
-        if (::transactionAdapter.isInitialized) {
-            transactionAdapter.updateDailyStats(
-                dailyBalancesMap,
-                dailyExpensesMap,
-                dailyIncomesMap
-            )
         }
     }
 
