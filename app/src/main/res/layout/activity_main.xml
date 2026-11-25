@@ -210,45 +210,94 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilSearch"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        <TextView
+            android:id="@+id/tvHistoryLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:hint="Пошук за категорією, коментарем або сумою"
-            app:boxCornerRadiusBottomEnd="28dp"
-            app:boxCornerRadiusBottomStart="28dp"
-            app:boxCornerRadiusTopEnd="28dp"
-            app:boxCornerRadiusTopStart="28dp"
-            app:boxStrokeColor="@color/selector_input_stroke"
-            app:hintEnabled="true"
-            app:hintTextColor="@color/dark_green"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Останні транзакції"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/barrierHistoryActions"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardBalance"
-            app:startIconDrawable="@android:drawable/ic_menu_search"
-            app:startIconTint="@color/dark_green">
+            app:layout_constraintTop_toBottomOf="@id/cardBalance" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etSearch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:maxLines="1" />
-        </com.google.android.material.textfield.TextInputLayout>
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrierHistoryActions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="start"
+            app:constraint_referenced_ids="layoutFilterIcons,btnResetFilters" />
+
+        <LinearLayout
+            android:id="@+id/layoutFilterIcons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@id/tvHistoryLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvHistoryLabel">
+
+            <ImageButton
+                android:id="@+id/btnSearch"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Пошук"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_search"
+                app:tint="@color/text_primary" />
+
+            <ImageButton
+                android:id="@+id/btnToggleFilters"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="0dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Фільтри"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_filter"
+                app:tint="@color/text_primary" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnResetFilters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_glossy_outline_green"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:text="Скинути"
+            android:textColor="@color/dark_green"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/tvHistoryLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvHistoryLabel" />
 
         <HorizontalScrollView
             android:id="@+id/filterScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:clipToPadding="false"
             android:paddingHorizontal="16dp"
             android:scrollbars="none"
-            app:layout_constraintTop_toBottomOf="@id/tilSearch">
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/tvHistoryLabel">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -259,76 +308,52 @@
                     android:id="@+id/btnFilterType"
                     style="@style/GlossyOutlineButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="38dp"
                     android:layout_marginEnd="8dp"
                     android:text="Тип: Всі"
-                    android:textColor="@color/text_secondary" />
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
 
                 <Button
                     android:id="@+id/btnFilterCategory"
                     style="@style/GlossyOutlineButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="38dp"
                     android:layout_marginEnd="8dp"
                     android:text="Категорія: Всі"
-                    android:textColor="@color/text_secondary" />
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
 
                 <Button
                     android:id="@+id/btnFilterSpecificDate"
                     style="@style/GlossyOutlineButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="38dp"
                     android:layout_marginEnd="8dp"
                     android:text="Дата: Всі"
-                    android:textColor="@color/text_secondary" />
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
 
                 <Button
                     android:id="@+id/btnSortDate"
                     style="@style/GlossyOutlineButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="38dp"
                     android:layout_marginEnd="8dp"
                     android:text="Сорт: Нові"
-                    android:textColor="@color/text_secondary" />
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
 
                 <Button
                     android:id="@+id/btnFilterScroll"
                     style="@style/GlossyOutlineButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="38dp"
                     android:text="Список: ↑↓"
-                    android:textColor="@color/text_secondary" />
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
             </LinearLayout>
         </HorizontalScrollView>
-
-        <TextView
-            android:id="@+id/tvHistoryLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Останні транзакції"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/filterScroll" />
-
-        <TextView
-            android:id="@+id/btnResetFilters"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="4dp"
-            android:text="Скинути"
-            android:textColor="@color/dark_green"
-            android:textStyle="bold"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/tvHistoryLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvHistoryLabel" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvTransactions"
@@ -338,7 +363,7 @@
             android:clipToPadding="false"
             android:paddingBottom="112dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvHistoryLabel" />
+            app:layout_constraintTop_toBottomOf="@id/filterScroll" />
 
         <TextView
             android:id="@+id/tvEmptyState"
@@ -351,7 +376,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvHistoryLabel" />
+            app:layout_constraintTop_toBottomOf="@id/filterScroll" />
 
         <LinearLayout
             android:id="@+id/layoutUndoDelete"
@@ -428,23 +453,23 @@
             android:id="@+id/glossyBottomPanel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginBottom="18dp"
             android:background="@drawable/bg_glossy_panel"
             android:clickable="true"
             android:elevation="8dp"
             android:focusable="true"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="20dp"
+            android:padding="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
             <ImageButton
                 android:id="@+id/btnHome"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginStart="12dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Головна"
@@ -461,8 +486,8 @@
 
             <ImageButton
                 android:id="@+id/btnStatistics"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Аналітика"
                 android:elevation="0dp"
@@ -478,8 +503,8 @@
 
             <ImageButton
                 android:id="@+id/btnAddTransaction"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:layout_marginEnd="12dp"
                 android:background="@drawable/bg_add_button"
                 android:contentDescription="Додати транзакцію"

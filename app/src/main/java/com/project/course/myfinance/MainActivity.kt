@@ -85,6 +85,12 @@ class MainActivity : BaseNetworkActivity() {
     private var currentCategoryFilter = "all"
     private var currentSortOrder = "desc"
     private var currentSpecificDateFilter: Long? = null
+    private lateinit var layoutFilterIcons: LinearLayout
+    private lateinit var btnSearch: ImageButton
+    private lateinit var btnToggleFilters: ImageButton
+    private lateinit var filterScroll: android.widget.HorizontalScrollView
+    private var isFilterPanelVisible = false
+
     private lateinit var btnFilterType: Button
     private lateinit var btnFilterCategory: Button
     private lateinit var btnFilterSpecificDate: Button
@@ -131,7 +137,6 @@ class MainActivity : BaseNetworkActivity() {
 
         val btnAddTransaction = findViewById<ImageButton>(R.id.btnAddTransaction)
         val btnHome = findViewById<ImageButton>(R.id.btnHome)
-        val btnFilterScroll = findViewById<Button>(R.id.btnFilterScroll)
 
         tvTotalBalance = findViewById(R.id.tvTotalBalance)
         rvTransactions = findViewById(R.id.rvTransactions)
@@ -166,23 +171,28 @@ class MainActivity : BaseNetworkActivity() {
         btnFilterSpecificDate = findViewById(R.id.btnFilterSpecificDate)
         btnSortDate = findViewById(R.id.btnSortDate)
 
-        val etSearch =
-            findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etSearch)
+        layoutFilterIcons = findViewById(R.id.layoutFilterIcons)
+        btnSearch = findViewById(R.id.btnSearch)
+        btnToggleFilters = findViewById(R.id.btnToggleFilters)
+        filterScroll = findViewById(R.id.filterScroll)
 
-        etSearch.addTextChangedListener(object : android.text.TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: android.text.Editable?) {
-                resetInactivityTimer()
-                currentSearchQuery = s?.toString()?.trim() ?: ""
-                if (currentSearchQuery.isNotBlank()) {
-                    isAllLoaded = true
-                    loadTransactions()
-                } else {
-                    applyFiltersAndSort()
-                }
-            }
-        })
+        btnFilterType = findViewById(R.id.btnFilterType)
+        btnFilterCategory = findViewById(R.id.btnFilterCategory)
+        btnFilterSpecificDate = findViewById(R.id.btnFilterSpecificDate)
+        btnSortDate = findViewById(R.id.btnSortDate)
+        val btnFilterScroll = findViewById<Button>(R.id.btnFilterScroll)
+
+        btnSearch.setOnClickListener { showSearchDialog() }
+        btnToggleFilters.setOnClickListener {
+            isFilterPanelVisible = !isFilterPanelVisible
+            filterScroll.visibility = if (isFilterPanelVisible) View.VISIBLE else View.GONE
+        }
+
+        btnFilterType.setOnClickListener { showTypeFilterDialog() }
+        btnFilterCategory.setOnClickListener { showCategoryFilterDialog() }
+        btnFilterSpecificDate.setOnClickListener { showSpecificDatePicker() }
+        btnSortDate.setOnClickListener { showSortDialog() }
+        btnFilterScroll.setOnClickListener { showScrollNavigationDialog() }
 
         tvTotalBalance.text = "••••• ₴"
 
@@ -397,6 +407,64 @@ class MainActivity : BaseNetworkActivity() {
         }
     }
 
+    private fun showSearchDialog() {
+        val density = resources.displayMetrics.density
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding((24 * density).toInt(), (16 * density).toInt(), (24 * density).toInt(), (4 * density).toInt())
+        }
+
+        val tilSearch = com.google.android.material.textfield.TextInputLayout(
+            this,
+            null,
+            com.google.android.material.R.attr.textInputOutlinedStyle
+        ).apply {
+            hint = "Категорія, коментар або сума"
+            boxStrokeColor = androidx.core.content.ContextCompat.getColor(this@MainActivity, R.color.dark_green)
+            setBoxCornerRadii(12f * density, 12f * density, 12f * density, 12f * density)
+            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_CLEAR_TEXT
+        }
+
+        val input = com.google.android.material.textfield.TextInputEditText(tilSearch.context).apply {
+            setText(currentSearchQuery)
+            setSelection(currentSearchQuery.length)
+            isSingleLine = true
+            imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
+        }
+
+        tilSearch.addView(input)
+        layout.addView(tilSearch)
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Пошук транзакцій")
+            .setView(layout)
+            .setPositiveButton("Знайти") { _, _ ->
+                resetInactivityTimer()
+                currentSearchQuery = input.text?.toString()?.trim() ?: ""
+                if (currentSearchQuery.isNotBlank()) {
+                    isAllLoaded = true
+                    loadTransactions()
+                } else {
+                    applyFiltersAndSort()
+                }
+            }
+            .setNegativeButton("Скасувати", null)
+            .create()
+
+        input.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.performClick()
+                true
+            } else {
+                false
+            }
+        }
+
+        dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+        dialog.show()
+        input.requestFocus()
+    }
+
     private fun showTypeFilterDialog() {
         val options = arrayOf("Всі", "Витрати", "Доходи")
         val checkedItem = when (currentTypeFilter) {
@@ -431,7 +499,6 @@ class MainActivity : BaseNetworkActivity() {
 
                 var shortCat = options[which]
                 if (shortCat.length > 10 && which != 0) shortCat = shortCat.substring(0, 10) + "..."
-
                 btnFilterCategory.text = if (which == 0) "Категорія: Всі" else shortCat
                 isAllLoaded = true
                 loadTransactions()
@@ -457,10 +524,8 @@ class MainActivity : BaseNetworkActivity() {
                     set(Calendar.MILLISECOND, 0)
                 }
                 currentSpecificDateFilter = selectedCalendar.timeInMillis
-
                 val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
                 btnFilterSpecificDate.text = "Дата: ${sdf.format(selectedCalendar.time)}"
-
                 isAllLoaded = true
                 loadTransactions()
             }, year, month, day)
@@ -551,6 +616,7 @@ class MainActivity : BaseNetworkActivity() {
                 currentSearchQuery.isNotBlank() ||
                 currentSortOrder != "desc"
 
+        layoutFilterIcons.visibility = if (hasFilters) View.GONE else View.VISIBLE
         btnResetFilters.visibility = if (hasFilters) View.VISIBLE else View.GONE
     }
 
@@ -561,9 +627,6 @@ class MainActivity : BaseNetworkActivity() {
         currentSearchQuery = ""
         currentSortOrder = "desc"
 
-        findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etSearch).setText(
-            ""
-        )
         btnFilterType.text = "Тип: Всі"
         btnFilterCategory.text = "Категорія: Всі"
         btnFilterSpecificDate.text = "Дата: Всі"
@@ -571,6 +634,7 @@ class MainActivity : BaseNetworkActivity() {
 
         currentLimit = 30L
         isAllLoaded = false
+        applyFiltersAndSort()
         loadTransactions()
         Toast.makeText(this, "Фільтри скинуто", Toast.LENGTH_SHORT).show()
     }
@@ -586,10 +650,10 @@ class MainActivity : BaseNetworkActivity() {
         for ((button, isActive) in buttons) {
             if (isActive) {
                 button.setBackgroundResource(R.drawable.bg_glossy_green)
-                button.setTextColor(Color.parseColor("#F4F6F8"))
+                button.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.white_soft))
             } else {
                 button.setBackgroundResource(R.drawable.bg_glossy_outline)
-                button.setTextColor(Color.parseColor("#545B64"))
+                button.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.text_secondary))
             }
         }
     }
