@@ -53,6 +53,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import java.util.UUID
+import android.os.Build
+import android.provider.OpenableColumns
 
 class ProfileActivity : BaseNetworkActivity() {
     private val auth = FirebaseAuth.getInstance()
@@ -87,9 +89,16 @@ class ProfileActivity : BaseNetworkActivity() {
             uri?.let { performExport(it) }
         }
 
-    private val importLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+    private val openDocumentLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
             uri?.let { performImport(it) }
+        }
+
+    private val externalAppImportLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let { uri -> performImport(uri) }
+            }
         }
 
     private val googleReAuthLauncher =
@@ -384,6 +393,7 @@ class ProfileActivity : BaseNetworkActivity() {
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
+        handleIncomingFileIntent(intent, tabLayout)
         btnBack.setOnClickListener { finish() }
 
         findViewById<ImageView>(R.id.btnAbout).setOnClickListener {
@@ -428,6 +438,61 @@ class ProfileActivity : BaseNetworkActivity() {
 
         btnLogout.setOnClickListener { showLogoutDialog() }
         btnDeleteAccount.setOnClickListener { showDeleteAccountDialog() }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
+        handleIncomingFileIntent(intent, tabLayout)
+    }
+
+    private fun handleIncomingFileIntent(incomingIntent: Intent?, tabLayout: TabLayout) {
+        val action = incomingIntent?.action ?: return
+        if (action != Intent.ACTION_VIEW && action != Intent.ACTION_SEND) return
+
+        if (auth.currentUser == null) {
+            goToLogin()
+            return
+        }
+
+        val uri: Uri? = when (action) {
+            Intent.ACTION_VIEW -> incomingIntent.data
+            Intent.ACTION_SEND -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    incomingIntent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    incomingIntent.getParcelableExtra(Intent.EXTRA_STREAM)
+                }
+            }
+            else -> null
+        }
+
+        if (uri != null) {
+            tabLayout.getTabAt(1)?.select()
+            val fileName = getFileNameFromUri(uri)
+            AlertDialog.Builder(this)
+                .setTitle("Імпорт отриманого файлу")
+                .setMessage("Імпортувати транзакції з файлу «$fileName»?")
+                .setPositiveButton("Імпортувати") { _, _ -> performImport(uri) }
+                .setNegativeButton("Скасувати", null)
+                .show()
+        }
+    }
+
+    private fun getFileNameFromUri(uri: Uri): String {
+        var name: String? = null
+        if (uri.scheme == "content") {
+            contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+                ?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                        if (idx >= 0) name = cursor.getString(idx)
+                    }
+                }
+        }
+        return name ?: uri.lastPathSegment ?: "файл"
     }
 
     private fun showThemeSelectionDialog() {
@@ -516,10 +581,36 @@ class ProfileActivity : BaseNetworkActivity() {
     }
 
     private fun showImportDialog(formatLabel: String) {
+        val sources = arrayOf(
+            "Пристрій або Google Диск",
+            "Обрати через іншу програму"
+        )
+
         AlertDialog.Builder(this)
             .setTitle("Імпорт $formatLabel")
-            .setMessage("Оберіть файл формату $formatLabel. Нові транзакції будуть додані до вашого списку.")
-            .setPositiveButton("Вибрати файл") { _, _ -> importLauncher.launch("*/*") }
+            .setItems(sources) { _, which ->
+                when (which) {
+                    0 -> openDocumentLauncher.launch(
+                        arrayOf(
+                            "text/csv",
+                            "text/comma-separated-values",
+                            "text/plain",
+                            "application/json",
+                            "application/octet-stream",
+                            "*/*"
+                        )
+                    )
+                    1 -> {
+                        val pickIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                            type = "*/*"
+                            addCategory(Intent.CATEGORY_OPENABLE)
+                        }
+                        externalAppImportLauncher.launch(
+                            Intent.createChooser(pickIntent, "Оберіть програму з файлом")
+                        )
+                    }
+                }
+            }
             .setNegativeButton("Скасувати", null)
             .show()
     }
@@ -656,7 +747,9 @@ class ProfileActivity : BaseNetworkActivity() {
                                 .ifBlank { UUID.randomUUID().toString() },
                             type = map["type"] as? String ?: "",
                             category = map["category"] as? String ?: "",
-                            amount = (map["amount"] as? Double) ?: 0.0,
+                            amount = (map["amount"] as? Number)?.toDouble()
+                                ?: (map["amount"] as? String)?.replace(",", ".")?.toDoubleOrNull()
+                                ?: 0.0,
                             date = parsedDateLong,
                             comment = map["comment"] as? String ?: ""
                         )
