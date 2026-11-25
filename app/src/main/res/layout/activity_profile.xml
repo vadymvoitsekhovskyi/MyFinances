@@ -191,31 +191,179 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <Button
-                    android:id="@+id/btnSendData"
-                    style="@style/GlossyOutlineButton"
+                <!-- ПЛИТКА CSV -->
+                <LinearLayout
+                    android:id="@+id/cardCsvFile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="Надіслати"
-                    android:textColor="@color/dark_green" />
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_glossy_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="14dp">
 
-                <Button
-                    android:id="@+id/btnExportData"
-                    style="@style/GlossyOutlineButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="Експорт"
-                    android:textColor="@color/dark_green" />
+                    <TextView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_category_circle"
+                        android:gravity="center"
+                        android:text="CSV"
+                        android:textColor="@color/dark_green"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
 
-                <Button
-                    android:id="@+id/btnImportData"
-                    style="@style/GlossyOutlineButton"
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvCsvFileName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="middle"
+                            android:maxLines="1"
+                            android:text="myfinance_transactions.csv"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Затисніть, щоб перейменувати"
+                            android:textColor="@color/text_muted"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/btnShareCsv"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Надіслати CSV"
+                        android:padding="7dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_share"
+                        app:tint="@color/dark_green" />
+
+                    <ImageButton
+                        android:id="@+id/btnExportCsv"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="2dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Експорт CSV"
+                        android:padding="7dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_export"
+                        app:tint="@color/dark_green" />
+
+                    <ImageButton
+                        android:id="@+id/btnImportCsv"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="2dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Імпорт CSV"
+                        android:padding="7dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_import"
+                        app:tint="@color/dark_orange" />
+                </LinearLayout>
+
+                <!-- ПЛИТКА JSON -->
+                <LinearLayout
+                    android:id="@+id/cardJsonFile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Імпорт"
-                    android:textColor="@color/dark_orange" />
+                    android:background="@drawable/bg_glossy_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_category_circle"
+                        android:gravity="center"
+                        android:text="JSON"
+                        android:textColor="@color/dark_green"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvJsonFileName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="middle"
+                            android:maxLines="1"
+                            android:text="myfinance_transactions.json"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Затисніть, щоб перейменувати"
+                            android:textColor="@color/text_muted"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/btnShareJson"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Надіслати JSON"
+                        android:padding="7dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_share"
+                        app:tint="@color/dark_green" />
+
+                    <ImageButton
+                        android:id="@+id/btnExportJson"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="2dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Експорт JSON"
+                        android:padding="7dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_export"
+                        app:tint="@color/dark_green" />
+
+                    <ImageButton
+                        android:id="@+id/btnImportJson"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="2dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Імпорт JSON"
+                        android:padding="7dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_import"
+                        app:tint="@color/dark_orange" />
+                </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout

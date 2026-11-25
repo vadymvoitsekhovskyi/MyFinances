@@ -209,6 +209,7 @@ class AddTransactionActivity : BaseNetworkActivity() {
                 val msg =
                     if (editingTransactionId != null) "Зміни успішно збережено" else "Транзакцію успішно додано"
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                LocalBackupManager.syncFilesAsync(applicationContext)
                 finish()
             }
             .addOnFailureListener { e ->

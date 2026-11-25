@@ -309,9 +309,59 @@ class ProfileActivity : BaseNetworkActivity() {
         val btnChangeName = findViewById<Button>(R.id.btnChangeName)
         val btnChangeEmail = findViewById<Button>(R.id.btnChangeEmail)
         val btnChangePassword = findViewById<Button>(R.id.btnChangePassword)
-        val btnExportData = findViewById<Button>(R.id.btnExportData)
-        val btnImportData = findViewById<Button>(R.id.btnImportData)
-        val btnSendData = findViewById<Button>(R.id.btnSendData)
+
+        val cardCsvFile = findViewById<LinearLayout>(R.id.cardCsvFile)
+        val cardJsonFile = findViewById<LinearLayout>(R.id.cardJsonFile)
+        val tvCsvFileName = findViewById<TextView>(R.id.tvCsvFileName)
+        val tvJsonFileName = findViewById<TextView>(R.id.tvJsonFileName)
+
+        fun refreshFileNamesUI() {
+            tvCsvFileName.text = LocalBackupManager.getFullFileName(this, "csv")
+            tvJsonFileName.text = LocalBackupManager.getFullFileName(this, "json")
+        }
+        refreshFileNamesUI()
+        LocalBackupManager.syncFilesAsync(this)
+
+        cardCsvFile.setOnLongClickListener {
+            showRenameFileDialog("csv") { refreshFileNamesUI() }
+            true
+        }
+        cardJsonFile.setOnLongClickListener {
+            showRenameFileDialog("json") { refreshFileNamesUI() }
+            true
+        }
+
+        findViewById<android.widget.ImageButton>(R.id.btnShareCsv).setOnClickListener {
+            sharePreparedFile(
+                "csv"
+            )
+        }
+        findViewById<android.widget.ImageButton>(R.id.btnExportCsv).setOnClickListener {
+            currentExportFormat = "csv"
+            exportLauncher.launch(LocalBackupManager.getFullFileName(this, "csv"))
+        }
+        findViewById<android.widget.ImageButton>(R.id.btnImportCsv).setOnClickListener {
+            showImportDialog(
+                "CSV"
+            )
+        }
+
+// Іконки JSON
+        findViewById<android.widget.ImageButton>(R.id.btnShareJson).setOnClickListener {
+            sharePreparedFile(
+                "json"
+            )
+        }
+        findViewById<android.widget.ImageButton>(R.id.btnExportJson).setOnClickListener {
+            currentExportFormat = "json"
+            exportLauncher.launch(LocalBackupManager.getFullFileName(this, "json"))
+        }
+        findViewById<android.widget.ImageButton>(R.id.btnImportJson).setOnClickListener {
+            showImportDialog(
+                "JSON"
+            )
+        }
+
         val btnLogout = findViewById<Button>(R.id.btnLogout)
         val btnDeleteAccount = findViewById<Button>(R.id.btnDeleteAccount)
 
@@ -377,9 +427,7 @@ class ProfileActivity : BaseNetworkActivity() {
         btnChangeName.setOnClickListener { showChangeNameDialog() }
         btnChangeEmail.setOnClickListener { showChangeEmailDialog() }
         btnChangePassword.setOnClickListener { showChangePasswordDialog() }
-        btnExportData.setOnClickListener { showExportDialog() }
-        btnImportData.setOnClickListener { showImportDialog() }
-        btnSendData.setOnClickListener { showShareDialog() }
+
         btnLogout.setOnClickListener { showLogoutDialog() }
         btnDeleteAccount.setOnClickListener { showDeleteAccountDialog() }
     }
@@ -440,6 +488,79 @@ class ProfileActivity : BaseNetworkActivity() {
         layout.addView(cardView)
         dialog.setContentView(layout)
         dialog.show()
+    }
+
+    private fun showRenameFileDialog(format: String, onRenamed: () -> Unit) {
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(64, 40, 64, 10)
+        }
+        val input = EditText(this).apply {
+            hint = "Назва файлу"
+            setText(LocalBackupManager.getBaseFileName(this@ProfileActivity, format))
+            setSelection(text.length)
+        }
+        layout.addView(input)
+
+        AlertDialog.Builder(this)
+            .setTitle("Перейменувати ${format.uppercase()}")
+            .setView(layout)
+            .setPositiveButton("Зберегти") { _, _ ->
+                if (LocalBackupManager.renameFile(this, format, input.text.toString())) {
+                    onRenamed()
+                    Toast.makeText(this, "Назву файлу оновлено", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Некоректна назва файлу", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Скасувати", null)
+            .show()
+    }
+
+    private fun showImportDialog(formatLabel: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Імпорт $formatLabel")
+            .setMessage("Оберіть файл формату $formatLabel. Нові транзакції будуть додані до вашого списку.")
+            .setPositiveButton("Вибрати файл") { _, _ -> importLauncher.launch("*/*") }
+            .setNegativeButton("Скасувати", null)
+            .show()
+    }
+
+    private fun sharePreparedFile(format: String) {
+        setLoading(true)
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val file = LocalBackupManager.getBackupFile(this@ProfileActivity, format)
+                if (!file.exists()) {
+                    LocalBackupManager.syncFilesSuspend(this@ProfileActivity)
+                }
+                val uri = FileProvider.getUriForFile(
+                    this@ProfileActivity,
+                    "${packageName}.fileprovider",
+                    file
+                )
+                val mimeType = if (format == "json") "application/json" else "text/csv"
+
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = mimeType
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    putExtra(Intent.EXTRA_SUBJECT, "Транзакції MyFinances: ${file.name}")
+                    clipData = ClipData.newRawUri(file.name, uri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+
+                withContext(Dispatchers.Main) {
+                    setLoading(false)
+                    startActivity(Intent.createChooser(shareIntent, "Надіслати файл через"))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    setLoading(false)
+                    Toast.makeText(this@ProfileActivity, "Помилка: ${e.message}", Toast.LENGTH_LONG)
+                        .show()
+                }
+            }
+        }
     }
 
     override fun dispatchTouchEvent(event: android.view.MotionEvent): Boolean {
@@ -601,6 +722,8 @@ class ProfileActivity : BaseNetworkActivity() {
                     }
                     batch.commit().await()
                 }
+
+                LocalBackupManager.syncFilesSuspend(this@ProfileActivity)
 
                 withContext(Dispatchers.Main) {
                     setLoading(false)

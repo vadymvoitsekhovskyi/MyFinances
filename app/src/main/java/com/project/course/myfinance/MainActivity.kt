@@ -1120,6 +1120,7 @@ class MainActivity : BaseNetworkActivity() {
 
         batch.commit().addOnSuccessListener {
             Toast.makeText(this, "Успішно видалено", Toast.LENGTH_SHORT).show()
+            LocalBackupManager.syncFilesAsync(applicationContext)
             clearSelection()
         }.addOnFailureListener { e ->
             Toast.makeText(this, "Помилка видалення: ${e.message}", Toast.LENGTH_LONG).show()
