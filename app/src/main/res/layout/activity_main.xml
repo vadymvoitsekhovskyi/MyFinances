@@ -40,20 +40,6 @@
                     android:textSize="32sp"
                     android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/btnStatistics"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginEnd="12dp"
-                    android:background="@drawable/bg_glossy_pin"
-                    android:clickable="true"
-                    android:contentDescription="Аналітика"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:padding="11dp"
-                    android:src="@drawable/ic_statistics"
-                    app:tint="@color/dark_green" />
-
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cvProfile"
                     android:layout_width="50dp"
@@ -301,7 +287,16 @@
                     style="@style/GlossyOutlineButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
                     android:text="Сорт: Нові"
+                    android:textColor="@color/text_secondary" />
+
+                <Button
+                    android:id="@+id/btnFilterScroll"
+                    style="@style/GlossyOutlineButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Список: ↑↓"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
         </HorizontalScrollView>
@@ -341,7 +336,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
             android:clipToPadding="false"
-            android:paddingBottom="80dp"
+            android:paddingBottom="112dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvHistoryLabel" />
 
@@ -434,36 +429,28 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginBottom="18dp"
+            android:layout_marginBottom="24dp"
             android:background="@drawable/bg_glossy_panel"
             android:clickable="true"
             android:elevation="8dp"
             android:focusable="true"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="8dp"
+            android:padding="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
             <ImageButton
-                android:id="@+id/btnScrollUp"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:id="@+id/btnHome"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="12dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Головна"
                 android:elevation="0dp"
-                android:src="@drawable/ic_arrow_up_flat"
-                android:stateListAnimator="@null"
-                app:tint="@color/dark_green" />
-
-            <ImageButton
-                android:id="@+id/btnScrollDown"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="4dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:elevation="0dp"
-                android:src="@drawable/ic_arrow_down_flat"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_home"
                 android:stateListAnimator="@null"
                 app:tint="@color/dark_green" />
 
@@ -473,11 +460,29 @@
                 android:layout_weight="1" />
 
             <ImageButton
+                android:id="@+id/btnStatistics"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Аналітика"
+                android:elevation="0dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_statistics"
+                android:stateListAnimator="@null"
+                app:tint="@color/text_secondary" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <ImageButton
                 android:id="@+id/btnAddTransaction"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_marginEnd="8dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="12dp"
                 android:background="@drawable/bg_add_button"
+                android:contentDescription="Додати транзакцію"
                 android:elevation="0dp"
                 android:src="@android:drawable/ic_input_add"
                 android:stateListAnimator="@null"

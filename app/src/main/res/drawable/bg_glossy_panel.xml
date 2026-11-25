@@ -11,18 +11,9 @@
             <gradient
                 android:angle="270"
                 android:centerColor="#1AFFFFFF"
-                android:endColor="#141B5E20"
+                android:endColor="#401B5E20"
                 android:startColor="#80FFFFFF" />
             <corners android:radius="100dp" />
-        </shape>
-    </item>
-    <item>
-        <shape android:shape="rectangle">
-            <solid android:color="@android:color/transparent" />
-            <corners android:radius="100dp" />
-            <stroke
-                android:width="1.8dp"
-                android:color="#661B5E20" />
         </shape>
     </item>
 </layer-list>

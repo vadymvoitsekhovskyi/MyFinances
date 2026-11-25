@@ -130,8 +130,8 @@ class MainActivity : BaseNetworkActivity() {
         }
 
         val btnAddTransaction = findViewById<ImageButton>(R.id.btnAddTransaction)
-        val btnScrollUp = findViewById<ImageButton>(R.id.btnScrollUp)
-        val btnScrollDown = findViewById<ImageButton>(R.id.btnScrollDown)
+        val btnHome = findViewById<ImageButton>(R.id.btnHome)
+        val btnFilterScroll = findViewById<Button>(R.id.btnFilterScroll)
 
         tvTotalBalance = findViewById(R.id.tvTotalBalance)
         rvTransactions = findViewById(R.id.rvTransactions)
@@ -210,26 +210,14 @@ class MainActivity : BaseNetworkActivity() {
             startActivity(intent)
         }
 
-        btnScrollUp.setOnClickListener {
-            rvTransactions.scrollToPosition(0)
-
-            val hasFilters = currentTypeFilter != "all" ||
-                    currentCategoryFilter != "all" ||
-                    currentSpecificDateFilter != null ||
-                    currentSearchQuery.isNotBlank() ||
-                    currentSortOrder != "desc"
-
-            if (isAllLoaded && !hasFilters && transactionAdapter.selectedIds.isEmpty()) {
-                isAllLoaded = false
-                currentLimit = 30L
-                loadTransactions()
+        btnHome.setOnClickListener {
+            if (transactionAdapter.itemCount > 0) {
+                rvTransactions.smoothScrollToPosition(0)
             }
         }
 
-        btnScrollDown.setOnClickListener {
-            isScrollDownRequested = true
-            isAllLoaded = true
-            loadTransactions()
+        btnFilterScroll.setOnClickListener {
+            showScrollNavigationDialog()
         }
 
         btnAddTransaction.setOnClickListener {
@@ -284,6 +272,43 @@ class MainActivity : BaseNetworkActivity() {
         loadTransactions()
         updateProfileIcon()
         setupBalanceVideo()
+    }
+
+    private fun showScrollNavigationDialog() {
+        val options = arrayOf("На початок списку (↑)", "В самий низ списку (↓)")
+
+        AlertDialog.Builder(this)
+            .setTitle("Швидкий перехід")
+            .setItems(options) { dialog, which ->
+                when (which) {
+                    0 -> scrollToTop()
+                    1 -> scrollToBottom()
+                }
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun scrollToTop() {
+        rvTransactions.scrollToPosition(0)
+
+        val hasFilters = currentTypeFilter != "all" ||
+                currentCategoryFilter != "all" ||
+                currentSpecificDateFilter != null ||
+                currentSearchQuery.isNotBlank() ||
+                currentSortOrder != "desc"
+
+        if (isAllLoaded && !hasFilters && transactionAdapter.selectedIds.isEmpty()) {
+            isAllLoaded = false
+            currentLimit = 30L
+            loadTransactions()
+        }
+    }
+
+    private fun scrollToBottom() {
+        isScrollDownRequested = true
+        isAllLoaded = true
+        loadTransactions()
     }
 
     private fun setupBalanceVideo() {
