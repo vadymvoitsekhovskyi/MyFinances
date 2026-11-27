@@ -280,6 +280,7 @@ class MainActivity : BaseNetworkActivity() {
         loadTransactions()
         updateProfileIcon()
         setupBalanceVideo()
+        AppUpdateManager.checkForUpdates(this)
     }
 
     private fun showScrollNavigationDialog() {
@@ -662,6 +663,7 @@ class MainActivity : BaseNetworkActivity() {
             finish()
         } else {
             updateProfileIcon()
+            AppUpdateManager.resumePendingInstallIfPermitted(this)
             if (balanceMediaPlayer?.isPlaying == false) {
                 balanceMediaPlayer?.start()
             }
