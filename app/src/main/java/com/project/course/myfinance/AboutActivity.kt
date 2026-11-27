@@ -29,7 +29,7 @@ class AboutActivity : BaseNetworkActivity() {
                 @Suppress("DEPRECATION")
                 packageManager.getPackageInfo(packageName, 0)
             }
-            val rawVersion = packageInfo.versionName ?: "1.0"
+            val rawVersion = packageInfo.versionName ?: "1.0.0"
             rawVersion
                 .replace(Regex("\\s*\\([^)]*(?:fatal:|warning:|safe\\.directory)[^)]*\\)"), "")
                 .replace(Regex("\\s+"), " ")
