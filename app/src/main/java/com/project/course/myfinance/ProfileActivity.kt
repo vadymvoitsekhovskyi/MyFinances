@@ -167,6 +167,10 @@ class ProfileActivity : BaseNetworkActivity() {
             showThemeSelectionDialog()
         }
 
+        findViewById<Button>(R.id.btnAppUpdate).setOnClickListener {
+            AppUpdateManager.openUpdateSettingsDialog(this)
+        }
+
         btnSetPin.setOnClickListener {
             val layout = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
@@ -440,6 +444,11 @@ class ProfileActivity : BaseNetworkActivity() {
         btnDeleteAccount.setOnClickListener { showDeleteAccountDialog() }
     }
 
+    override fun onResume() {
+        super.onResume()
+        AppUpdateManager.resumePendingInstallIfPermitted(this)
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -466,6 +475,7 @@ class ProfileActivity : BaseNetworkActivity() {
                     incomingIntent.getParcelableExtra(Intent.EXTRA_STREAM)
                 }
             }
+
             else -> null
         }
 
@@ -600,6 +610,7 @@ class ProfileActivity : BaseNetworkActivity() {
                             "*/*"
                         )
                     )
+
                     1 -> {
                         val pickIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
                             type = "*/*"

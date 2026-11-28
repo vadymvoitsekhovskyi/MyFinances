@@ -383,6 +383,15 @@
                     android:textColor="@color/text_primary" />
 
                 <Button
+                    android:id="@+id/btnAppUpdate"
+                    style="@style/GlossyOutlineButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Оновити застосунок"
+                    android:textColor="@color/text_primary" />
+
+                <Button
                     android:id="@+id/btnSetPin"
                     style="@style/GlossyOutlineButton"
                     android:layout_width="match_parent"
